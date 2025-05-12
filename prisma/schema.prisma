@@ -1,0 +1,70 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           Int      @id @default(autoincrement())
+  loginId   String   @unique
+  loginPassword     String
+  nickname     String
+  streams       YoutubeStream[] // 1:N 관계
+  streamStats   StreamStats[]   // 1:N 관계
+  chats         Chat[]         // 1:N 관계
+}
+
+model YoutubeStream {
+  id                 Int      @id @default(autoincrement())
+  user            User          @relation(fields: [userId], references: [id])
+  userId             Int  
+  title             String
+  streamStartTime    DateTime
+  streamEndTime      DateTime?
+  streamingUrl      String
+  thumbnail         String
+  stats           StreamStats[] // 1:N 관계
+  chats           Chat[]       // 1:N 관계
+}
+
+model StreamStats {
+  id                 Int      @id @default(autoincrement())
+  youtubeStream   YoutubeStream @relation(fields: [youtubeStreamId], references: [id])
+  youtubeStreamId Int
+  user            User          @relation(fields: [userId], references: [id])
+  userId        Int
+  entryTime         DateTime
+  exitTime          DateTime?
+
+  @@index([youtubeStreamId])
+  @@index([userId])
+}
+
+
+model Chat {
+  id                 Int      @id @default(autoincrement())
+  youtubeStream   YoutubeStream @relation(fields: [youtubeStreamId], references: [id])
+  youtubeStreamId Int
+  user            User          @relation(fields: [userId], references: [id])
+  userId       Int
+  message            String
+  createdAt         DateTime @default(now())
+
+  @@index([youtubeStreamId])
+  @@index([userId])
+}
+
+
+
+
+
