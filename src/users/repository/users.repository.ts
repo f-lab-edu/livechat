@@ -24,8 +24,4 @@ export class UsersRepository {
   }): Promise<User> {
     return this.prisma.user.update(params);
   }
-
-  async delete(where: Prisma.UserWhereUniqueInput): Promise<User> {
-    return this.prisma.user.delete({ where });
-  }
 }
