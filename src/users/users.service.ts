@@ -6,10 +6,15 @@ import {
 import { CreateUserDto, LoginUserDto } from './dto/user.dto';
 import * as bcrypt from 'bcrypt';
 import { UsersRepository } from './repository/users.repository';
+import { JwtService } from '@nestjs/jwt';
+import { JwtPayload } from '../auth/jwt-strategy';
 
 @Injectable()
 export class UsersService {
-  constructor(private readonly usersRepo: UsersRepository) {}
+  constructor(
+    private readonly usersRepo: UsersRepository,
+    private readonly jwtService: JwtService,
+  ) {}
 
   async create(createUserDto: CreateUserDto): Promise<void> {
     const existingUser = await this.usersRepo.findByLoginId(
@@ -29,7 +34,7 @@ export class UsersService {
     });
   }
 
-  async login(loginUserDto: LoginUserDto): Promise<void> {
+  async login(loginUserDto: LoginUserDto): Promise<string> {
     try {
       const user = await this.usersRepo.findByLoginId(loginUserDto.loginId);
 
@@ -45,6 +50,9 @@ export class UsersService {
       if (!isPasswordValid) {
         throw new UnauthorizedException('Invalid credentials');
       }
+
+      const payload: JwtPayload = { userId: user.id, loginId: user.loginId };
+      return this.jwtService.sign(payload);
     } catch (error) {
       // DB 또는 bcrypt 에러 처리
       console.log(error);
