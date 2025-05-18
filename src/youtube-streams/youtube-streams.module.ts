@@ -4,6 +4,6 @@ import { YoutubeStreamsService } from './youtube-streams.service';
 
 @Module({
   controllers: [YoutubeStreamsController],
-  providers: [YoutubeStreamsService]
+  providers: [YoutubeStreamsService],
 })
 export class YoutubeStreamsModule {}

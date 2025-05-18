@@ -3,7 +3,7 @@ import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
-async function bootstrap() {
+void (async () => {
   const app = await NestFactory.create(AppModule);
 
   const config = new DocumentBuilder()
@@ -18,5 +18,4 @@ async function bootstrap() {
   app.useGlobalPipes(new ValidationPipe());
   app.enableShutdownHooks();
   await app.listen(process.env.PORT ?? 3000);
-}
-bootstrap();
+})();

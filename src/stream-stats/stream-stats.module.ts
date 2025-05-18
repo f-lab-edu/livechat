@@ -4,6 +4,6 @@ import { StreamStatsService } from './stream-stats.service';
 
 @Module({
   controllers: [StreamStatsController],
-  providers: [StreamStatsService]
+  providers: [StreamStatsService],
 })
 export class StreamStatsModule {}
