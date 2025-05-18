@@ -6,9 +6,16 @@ import { YoutubeStreamsModule } from './youtube-streams/youtube-streams.module';
 
 import { ChatsModule } from './chats/chats.module';
 import { StreamStatsModule } from './stream-stats/stream-stats.module';
+import { PrismaModule } from './prisma/prisma.module';
 
 @Module({
-  imports: [UsersModule, YoutubeStreamsModule, ChatsModule, StreamStatsModule],
+  imports: [
+    UsersModule,
+    YoutubeStreamsModule,
+    ChatsModule,
+    StreamStatsModule,
+    PrismaModule,
+  ],
   controllers: [AppController],
   providers: [AppService],
 })
