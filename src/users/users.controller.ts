@@ -19,6 +19,7 @@ export class UsersController {
     @Body() loginUserDto: LoginUserDto,
   ): Promise<{ message: string }> {
     await this.usersService.login(loginUserDto);
+
     return { message: '로그인 성공' };
   }
 }
