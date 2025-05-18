@@ -9,11 +9,8 @@
 
 ## 📺 프로젝트 설계
 
-- 프로젝트 성능 테스트 환경
     - [📋 API 명세서]()
-    - [📊 ERD (Entity Relationship Diagram)]()
-    - [🔍 Query Patterns]()
-    - [🧪 부하 테스트 환경과 개요]()
+    - [📒 요구사항 정의서](https://github.com/f-lab-edu/livechat/wiki/PRD_v1)
+    - [📊 ERD (Entity Relationship Diagram)](https://github.com/f-lab-edu/livechat/wiki/ERD_v1)
+    - [📃 System architecture](https://github.com/f-lab-edu/livechat/wiki/%EC%8B%9C%EC%8A%A4%ED%85%9C-%EC%95%84%ED%82%A4%ED%85%8D%EC%B2%98_v1)
 
-
-## 시스템 아키텍처
