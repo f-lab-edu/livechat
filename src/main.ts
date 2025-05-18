@@ -2,8 +2,9 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { LoggingInterceptor } from './interceptors/logging.interceptor';
 
-async function bootstrap() {
+void (async () => {
   const app = await NestFactory.create(AppModule);
 
   const config = new DocumentBuilder()
@@ -15,8 +16,8 @@ async function bootstrap() {
 
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('swagger', app, document);
+  app.useGlobalInterceptors(new LoggingInterceptor());
   app.useGlobalPipes(new ValidationPipe());
   app.enableShutdownHooks();
   await app.listen(process.env.PORT ?? 3000);
-}
-bootstrap();
+})();

@@ -13,6 +13,8 @@ services:
     volumes:
       - .:/app
     command: npm run start:dev
+    environment:
+      - TZ=Asia/Seoul
     networks:
       - app-network
 
