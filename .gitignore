@@ -137,3 +137,7 @@ dist
 .pnp.*
 
 .vscode
+.env*
+.flaskenv*
+!.env.project
+!.env.vault

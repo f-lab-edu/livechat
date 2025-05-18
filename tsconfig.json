@@ -17,11 +17,12 @@
     "noImplicitAny": false,
     "strictBindCallApply": false,
     "noFallthroughCasesInSwitch": false,
-     "strict": true,
+    "strict": true,
     "strictPropertyInitialization": false,
     "typeRoots": ["./node_modules/@types"],
     "paths": {
       "*": ["node_modules/*"]
     }
-  }
+  },
+  "include": ["src", "prisma"]
 }

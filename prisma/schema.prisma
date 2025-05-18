@@ -6,7 +6,6 @@
 
 generator client {
   provider = "prisma-client-js"
-  output   = "../generated/prisma"
 }
 
 datasource db {
@@ -21,7 +20,7 @@ model User {
   nickname     String
   streams       YoutubeStream[] // 1:N 관계
   streamStats   StreamStats[]   // 1:N 관계
-  chats         Chat[]         // 1:N 관계
+  chats         Chat[]         // 1:N 관계$#
 }
 
 model YoutubeStream {
