@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Live Stream Test</title>
+  </head>
+  <body>
+    <h1>📡 Live Stream to NestJS WebSocket</h1>
+    <video
+      id="preview"
+      autoplay
+      muted
+      width="640"
+      height="360"
+      style="border: 1px solid #ccc"
+    ></video>
+    <br />
+    <button onclick="startStreaming()">Start Streaming</button>
+    <button onclick="stopStreaming()">Stop Streaming</button>
+
+    <script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script>
+    <script>
+      let mediaRecorder;
+      let socket;
+      let isStreaming = false;
+
+      async function startStreaming() {
+        if (isStreaming) {
+          alert('이미 스트리밍 중입니다.');
+          return;
+        }
+
+        const streamKey = prompt('Enter your streamKey:', 'test123');
+        if (!streamKey) {
+          alert('streamKey가 필요합니다.');
+          return;
+        }
+
+        try {
+          const devices = await navigator.mediaDevices.enumerateDevices();
+          console.log('🎥 사용 가능한 장치:', devices);
+
+          const stream = await navigator.mediaDevices.getUserMedia({
+            video: true,
+            audio: true,
+          });
+
+          document.getElementById('preview').srcObject = stream;
+
+          socket = io('http://localhost:3000', {
+            query: { streamKey },
+            transports: ['websocket'],
+          });
+
+          socket.on('connect', () => {
+            console.log('✅ WebSocket 연결 완료');
+          });
+
+          socket.on('disconnect', () => {
+            console.log('❌ WebSocket 연결 종료됨');
+          });
+
+          mediaRecorder = new MediaRecorder(stream, {
+            mimeType: 'video/webm; codecs=vp8',
+          });
+
+          mediaRecorder.ondataavailable = (event) => {
+            if (event.data.size > 0 && socket.connected) {
+              event.data.arrayBuffer().then((buffer) => {
+                socket.emit('stream', buffer);
+              });
+            }
+          };
+
+          mediaRecorder.start(1000);
+          isStreaming = true;
+          console.log('📡 스트리밍 시작됨');
+        } catch (error) {
+          console.error('🚨 스트리밍 오류:', error);
+          if (
+            error.name === 'NotFoundError' ||
+            error.name === 'DevicesNotFoundError'
+          ) {
+            alert('❌ 카메라 또는 마이크 장치를 찾을 수 없습니다.');
+          } else if (
+            error.name === 'NotAllowedError' ||
+            error.name === 'PermissionDeniedError'
+          ) {
+            alert('❌ 권한이 거부되었습니다. 브라우저 설정을 확인하세요.');
+          } else {
+            alert('❌ 알 수 없는 오류 발생: ' + error.message);
+          }
+        }
+      }
+
+      function stopStreaming() {
+        mediaRecorder?.stop();
+        socket?.disconnect();
+        isStreaming = false;
+        console.log('🛑 스트리밍 종료');
+      }
+    </script>
+  </body>
+</html>

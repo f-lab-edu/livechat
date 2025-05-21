@@ -3,9 +3,15 @@ import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { LoggingInterceptor } from './interceptors/logging.interceptor';
+import * as fs from 'fs';
 
 void (async () => {
-  const app = await NestFactory.create(AppModule);
+  const httpsOptions = {
+    key: fs.readFileSync('./cert/localhost.key'),
+    cert: fs.readFileSync('./cert/localhost.crt'),
+  };
+
+  const app = await NestFactory.create(AppModule, { httpsOptions });
 
   const config = new DocumentBuilder()
     .setTitle('LiveChat API')
@@ -19,5 +25,6 @@ void (async () => {
   app.useGlobalInterceptors(new LoggingInterceptor());
   app.useGlobalPipes(new ValidationPipe());
   app.enableShutdownHooks();
-  await app.listen(process.env.PORT ?? 3000);
+  app.enableCors({ origin: true }); // WebSocket 및 HLS 허용
+  await app.listen(443);
 })();

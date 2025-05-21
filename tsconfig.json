@@ -19,6 +19,7 @@
     "noFallthroughCasesInSwitch": false,
     "strict": true,
     "strictPropertyInitialization": false,
+    "types": ["node", "jest", "express"],
     "typeRoots": ["./node_modules/@types"],
     "paths": {
       "*": ["node_modules/*"]

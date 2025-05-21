@@ -5,14 +5,16 @@ services:
       dockerfile: Dockerfile
     container_name: livechat-backend
     ports:
-      - '3000:3000'
+      - '443:443'
+      - '80:80'
     depends_on:
       - postgres
     env_file:
       - .env
     volumes:
       - .:/app
-    command: npm run start:dev
+      - ./cert:/app/cert # <-- 인증서 파일 바인딩
+    command: sh -c "npx prisma generate && npm run start:dev"
     environment:
       - TZ=Asia/Seoul
     networks:
@@ -52,7 +54,7 @@ services:
     image: alfg/nginx-rtmp
     container_name: nginx-hls
     ports:
-      - '1935:1935'
+      - '2935:1935'
       - '8080:8080'
     volumes:
       - ./public/hls:/usr/share/nginx/html/hls
