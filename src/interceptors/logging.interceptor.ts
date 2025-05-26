@@ -14,8 +14,8 @@ import * as path from 'path';
 export class LoggingInterceptor implements NestInterceptor {
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
     const req: Request = context.switchToHttp().getRequest();
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-    const { method, url, body } = req;
+    const { method, url } = req;
+    const body = req.body ?? {};
     const now = Date.now();
 
     return next.handle().pipe(

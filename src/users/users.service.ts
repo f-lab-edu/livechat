@@ -36,6 +36,9 @@ export class UsersService {
 
   async login(loginUserDto: LoginUserDto): Promise<string> {
     try {
+      console.log('test111');
+      console.log('test12');
+
       const user = await this.usersRepo.findByLoginId(loginUserDto.loginId);
 
       if (!user) {
