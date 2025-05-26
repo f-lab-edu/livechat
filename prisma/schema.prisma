@@ -31,7 +31,7 @@ model YoutubeStream {
   streamStartTime    DateTime
   streamEndTime      DateTime?
   streamingUrl      String
-  thumbnail         String
+  thumbnail         String?
   stats           StreamStats[] // 1:N 관계
   chats           Chat[]       // 1:N 관계
 }

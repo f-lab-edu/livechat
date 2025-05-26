@@ -7,12 +7,19 @@ export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Post('signup')
-  async signup(@Body() createUserDto: CreateUserDto) {
-    return this.usersService.create(createUserDto);
+  async signup(
+    @Body() createUserDto: CreateUserDto,
+  ): Promise<{ message: string }> {
+    await this.usersService.create(createUserDto);
+    return { message: '회원가입 성공' };
   }
 
   @Post('login')
-  async login(@Body() loginUserDto: LoginUserDto) {
-    return this.usersService.login(loginUserDto);
+  async login(
+    @Body() loginUserDto: LoginUserDto,
+  ): Promise<{ message: string; accessToken: string }> {
+    const accessToken = await this.usersService.login(loginUserDto);
+
+    return { message: '로그인 성공', accessToken: accessToken };
   }
 }

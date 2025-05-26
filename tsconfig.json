@@ -19,10 +19,12 @@
     "noFallthroughCasesInSwitch": false,
     "strict": true,
     "strictPropertyInitialization": false,
+    "types": ["node", "jest", "express"],
     "typeRoots": ["./node_modules/@types"],
     "paths": {
       "*": ["node_modules/*"]
     }
   },
-  "include": ["src", "prisma"]
+  "include": ["src", "prisma"],
+  "exclude": ["node_modules", "dist"]
 }
