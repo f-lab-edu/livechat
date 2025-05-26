@@ -1,0 +1,276 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Live Stream Test</title>
+  </head>
+  <body>
+    <h1>📡 Live Stream to NestJS WebSocket</h1>
+    <video
+      id="preview"
+      autoplay
+      muted
+      width="640"
+      height="360"
+      style="border: 1px solid #ccc"
+    ></video>
+    <br />
+    <button onclick="startStreaming()">카메라 스트리밍 시작</button>
+    <button onclick="stopStreaming()">스트리밍 중지</button>
+    <input
+      type="file"
+      id="videoFileInput"
+      accept="video/*"
+      style="display: none"
+    />
+    <button onclick="document.getElementById('videoFileInput').click()">
+      동영상 첨부 스트리밍
+    </button>
+
+    <script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script>
+    <script>
+      let mediaRecorder;
+      let socket;
+      let isStreaming = false;
+      let fileStream;
+      let fileReader;
+      let fileStreaming = false;
+
+      async function startStreaming() {
+        console.log('[LOG] startStreaming() 호출');
+        if (isStreaming || fileStreaming) {
+          alert('이미 스트리밍 중입니다.');
+          console.log('[WARN] 이미 스트리밍 중');
+          return;
+        }
+
+        const streamKey = prompt('Enter your streamKey:', 'test123');
+        if (!streamKey) {
+          alert('streamKey가 필요합니다.');
+          console.log('[WARN] streamKey 입력 안됨');
+          return;
+        }
+
+        try {
+          const devices = await navigator.mediaDevices.enumerateDevices();
+          console.log('[LOG] 🎥 사용 가능한 장치:', devices);
+
+          const stream = await navigator.mediaDevices.getUserMedia({
+            video: true,
+            audio: true,
+          });
+
+          console.log('[LOG] 🎥 stream tracks:', stream.getTracks());
+          stream.getTracks().forEach((track, idx) => {
+            console.log(
+              `[LOG] stream track ${idx} readyState:`,
+              track.readyState,
+              ', kind:',
+              track.kind,
+            );
+          });
+          console.log('[LOG] stream.active:', stream.active);
+
+          document.getElementById('preview').srcObject = stream;
+
+          socket = io('https://localhost', {
+            query: { streamKey },
+            transports: ['websocket'],
+          });
+
+          socket.on('connect', () => {
+            console.log('[LOG] ✅ WebSocket 연결 완료');
+            console.log('[LOG] socket.connected:', socket.connected);
+          });
+          socket.on('disconnect', () => {
+            console.log('[LOG] ❌ WebSocket 연결 종료됨');
+          });
+          socket.on('connect_error', (err) => {
+            console.error('[ERROR] 소켓 연결 실패:', err);
+            alert('서버와 소켓 연결이 실패했습니다.');
+          });
+
+          if (!MediaRecorder.isTypeSupported('video/webm; codecs=vp8')) {
+            alert('이 브라우저는 video/webm; codecs=vp8을 지원하지 않습니다.');
+            console.log('[ERROR] MediaRecorder 지원 안함');
+            return;
+          }
+
+          try {
+            mediaRecorder = new MediaRecorder(stream, {
+              mimeType: 'video/webm; codecs=vp8',
+            });
+          } catch (err) {
+            console.error('[ERROR] MediaRecorder 생성 실패:', err);
+            alert('MediaRecorder 생성 실패: ' + err.message);
+            return;
+          }
+
+          console.log('[LOG] mediaRecorder:', mediaRecorder);
+
+          mediaRecorder.onerror = (e) => {
+            console.error('[ERROR] MediaRecorder 오류:', e.error);
+          };
+          mediaRecorder.onstop = () => {
+            console.log('[LOG] MediaRecorder stopped');
+          };
+          mediaRecorder.onstart = () => {
+            console.log(
+              '[LOG] MediaRecorder started, state:',
+              mediaRecorder.state,
+            );
+          };
+          mediaRecorder.ondataavailable = (event) => {
+            console.log(
+              '[LOG] 📦 ondataavailable fired! event.data.size:',
+              event.data.size,
+              ', event:',
+              event,
+            );
+            if (event.data.size > 0) {
+              console.log(
+                '[LOG] 📦 데이터 있음! socket?',
+                !!socket,
+                'connected:',
+                socket?.connected,
+              );
+              if (socket && socket.connected) {
+                console.log('[LOG] 📦 소켓 데이터 전송됨:', event.data.size);
+                event.data.arrayBuffer().then((buffer) => {
+                  socket.emit('stream', buffer);
+                });
+              } else {
+                console.warn('[WARN] 소켓 연결 안됨, 데이터 전송 skip');
+              }
+            } else {
+              console.warn('[WARN] 데이터 크기 0');
+            }
+          };
+
+          try {
+            mediaRecorder.start();
+            console.log(
+              '[LOG] mediaRecorder.start(1000) 호출됨, state:',
+              mediaRecorder.state,
+            );
+          } catch (error) {
+            console.error('[ERROR] mediaRecorder.start() 에러:', error);
+            alert('mediaRecorder.start() 에러: ' + error.message);
+          }
+
+          isStreaming = true;
+          console.log(
+            '[LOG] 📡 카메라 스트리밍 시작됨, state:',
+            mediaRecorder.state,
+          );
+        } catch (error) {
+          console.error('[ERROR] 🚨 스트리밍 오류:', error);
+          if (
+            error.name === 'NotFoundError' ||
+            error.name === 'DevicesNotFoundError'
+          ) {
+            alert('❌ 카메라 또는 마이크 장치를 찾을 수 없습니다.');
+          } else if (
+            error.name === 'NotAllowedError' ||
+            error.name === 'PermissionDeniedError'
+          ) {
+            alert('❌ 권한이 거부되었습니다. 브라우저 설정을 확인하세요.');
+          } else {
+            alert('❌ 알 수 없는 오류 발생: ' + error.message);
+          }
+        }
+      }
+
+      function stopStreaming() {
+        console.log('[LOG] stopStreaming() 호출');
+        mediaRecorder?.stop();
+        socket?.disconnect();
+        isStreaming = false;
+        if (fileReader) {
+          fileReader.abort();
+        }
+        fileStreaming = false;
+        document.getElementById('preview').srcObject = null;
+        console.log('[LOG] 🛑 스트리밍 종료');
+      }
+
+      // 동영상 파일 첨부 스트리밍
+      document
+        .getElementById('videoFileInput')
+        .addEventListener('change', function (e) {
+          const file = e.target.files[0];
+          if (!file) return;
+
+          if (isStreaming || fileStreaming) {
+            alert('이미 스트리밍 중입니다.');
+            console.log('[WARN] 이미 스트리밍 중(파일)');
+            return;
+          }
+
+          const streamKey = prompt('Enter your streamKey:', 'test123');
+          if (!streamKey) {
+            alert('streamKey가 필요합니다.');
+            console.log('[WARN] streamKey 입력 안됨(파일)');
+            return;
+          }
+
+          socket = io('https://localhost', {
+            query: { streamKey },
+            transports: ['websocket'],
+          });
+
+          socket.on('connect', () => {
+            console.log('[LOG] ✅ WebSocket 연결 완료(파일)');
+          });
+
+          socket.on('disconnect', () => {
+            console.log('[LOG] ❌ WebSocket 연결 종료됨(파일)');
+          });
+
+          socket.on('connect_error', (err) => {
+            console.error('[ERROR] 소켓 연결 실패(파일):', err);
+            alert('서버와 소켓 연결이 실패했습니다.(파일)');
+          });
+
+          const video = document.getElementById('preview');
+          video.srcObject = null;
+          video.src = URL.createObjectURL(file);
+          video.play();
+
+          fileReader = new FileReader();
+          const chunkSize = 64 * 1024; // 64KB
+          let offset = 0;
+          fileStreaming = true;
+
+          fileReader.onload = function (event) {
+            if (event.target.error == null && socket.connected) {
+              socket.emit('stream', event.target.result);
+              offset += event.target.result.byteLength;
+              console.log('[LOG] 파일 청크 전송:', offset, '/', file.size);
+            }
+            if (offset < file.size && fileStreaming) {
+              readNextChunk();
+            } else {
+              socket.disconnect();
+              fileStreaming = false;
+              console.log('[LOG] 📤 파일 스트리밍 완료');
+            }
+          };
+
+          fileReader.onerror = function (err) {
+            console.error('[ERROR] 파일 읽기 오류:', err);
+            socket.disconnect();
+            fileStreaming = false;
+          };
+
+          function readNextChunk() {
+            const slice = file.slice(offset, offset + chunkSize);
+            fileReader.readAsArrayBuffer(slice);
+          }
+
+          readNextChunk();
+          console.log('[LOG] 📤 파일 스트리밍 시작');
+        });
+    </script>
+  </body>
+</html>
