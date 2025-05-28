@@ -48,7 +48,9 @@ services:
   #     - app-network
 
   nginx:
-    image: alfg/nginx-rtmp:latest
+    build:
+      context: .
+      dockerfile: Dockerfile.nginx-rtmp
     container_name: nginx-hls
     ports:
       - '2935:1935'
