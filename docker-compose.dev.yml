@@ -61,9 +61,8 @@ services:
       - '2935:1935'
       - '80:80'
     volumes:
-      # - ./public/hls:/opt/data/hls
-      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
-      - ./public:/www/static
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf.template
+      # - ./public:/www/static
     restart: always
     networks:
       - app-network
