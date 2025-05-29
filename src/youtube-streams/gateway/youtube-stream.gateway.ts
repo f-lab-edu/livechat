@@ -39,17 +39,40 @@ export class YoutubeStreamGateway
     // const outputFilename = `/app/recordings/${streamKey}-${Date.now()}.mp4`;
 
     const ffmpeg = spawn('ffmpeg', [
-      '-re',
+      '-f',
+      'webm',
       '-i',
       'pipe:0',
+
+      // 명시적 stream mapping
+      '-map',
+      '0:v:0',
+      '-map',
+      '0:a:0',
+
+      // 영상 인코딩
       '-c:v',
       'libx264',
       '-preset',
-      'ultrafast',
-      '-tune',
-      'zerolatency',
+      'veryfast',
+      '-profile:v',
+      'baseline',
+      '-g',
+      '30',
+      '-keyint_min',
+      '30',
+      '-sc_threshold',
+      '0',
+
+      // 오디오 인코딩
       '-c:a',
       'aac',
+      '-ar',
+      '48000',
+      '-b:a',
+      '128k',
+
+      // HLS가 이해 가능한 포맷
       '-f',
       'flv',
       `rtmp://nginx-hls/stream/${streamKey}`,

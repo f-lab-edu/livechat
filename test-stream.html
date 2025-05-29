@@ -98,13 +98,15 @@
 
           try {
             mediaRecorder = new MediaRecorder(stream, {
-              mimeType: 'video/webm; codecs=vp8',
+              mimeType: 'video/webm; codecs=vp8,opus',
             });
           } catch (err) {
             console.error('[ERROR] MediaRecorder 생성 실패:', err);
             alert('MediaRecorder 생성 실패: ' + err.message);
             return;
           }
+
+          console.log(stream.getAudioTracks());
 
           console.log('[LOG] mediaRecorder:', mediaRecorder);
 
