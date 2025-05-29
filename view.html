@@ -14,7 +14,7 @@
       const streamKey = prompt('Enter Stream Key:', 'test123');
       // 원하는 해상도(Variant)를 선택할 수 있도록 기본은 720p로
       const variant = '_720p2628kbs'; // or '_480p1128kbs' 등
-      const videoSrc = `http://localhost/hls/${streamKey}${variant}/index.m3u8`;
+      const videoSrc = `http://localhost/hls/${streamKey}.m3u8`;
       // http://localhost/hls/test_720p2628kbs/index.m3u8
 
       if (Hls.isSupported()) {
