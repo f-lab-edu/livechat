@@ -23,6 +23,7 @@ export class YoutubeStreamGateway
 
   private ffmpegMap = new Map<string, ChildProcessWithoutNullStreams>();
 
+  // 클라이언트가 Websocket 서버에 연결될 대 자동으로 호출
   handleConnection(client: Socket) {
     console.log(`Client connected: ${client.id}`);
 
@@ -99,6 +100,7 @@ export class YoutubeStreamGateway
     this.ffmpegMap.set(client.id, ffmpeg);
   }
 
+  // 클라이언트가 Websocket 서버와 연결을 끊을 때 자동으로 호출
   handleDisconnect(client: Socket) {
     console.log(`Client disconnected: ${client.id}`);
     const ffmpeg = this.ffmpegMap.get(client.id);
