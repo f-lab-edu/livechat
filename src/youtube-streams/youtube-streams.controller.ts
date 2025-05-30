@@ -10,6 +10,7 @@ import { ApiBearerAuth } from '@nestjs/swagger';
 export class YoutubeStreamsController {
   constructor(private readonly youtubeStreamsService: YoutubeStreamsService) {}
 
+  // 라이브 썸네일 생성
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @Post('live')
@@ -17,10 +18,7 @@ export class YoutubeStreamsController {
     @Body() createYoutubeStreamReqDto: CreateYoutubeStreamReqDto,
     @CurrentUser() user: JwtPayload,
   ): Promise<{ message: string }> {
-    await this.youtubeStreamsService.createYoutubeStream(
-      createYoutubeStreamReqDto,
-      user.userId,
-    );
+    await this.youtubeStreamsService.createYoutubeStream(createYoutubeStreamReqDto, user.userId);
     return { message: 'test' };
   }
 
@@ -31,5 +29,19 @@ export class YoutubeStreamsController {
 
   // 스트림키 조회
 
+  @Get('stream-key')
+  async getStreamKey(): Promise<{ streamKey: string }> {
+    // 스트림키 조회 로직
+    return { streamKey: 'exampleStreamKey123' };
+  }
+
   // 스트림키 생성
+  @Post('stream-key')
+  async createStreamKey(): Promise<{ streamKey: string }> {
+    // 스트림키 생성 로직
+    const streamKey = 'newStreamKey456'; // 예시로 고정된 스트림키 사용
+    return { streamKey };
+  }
+
+  // 스트리밍 중인 방송 리스트
 }
