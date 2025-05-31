@@ -1,100 +1,72 @@
-import { Injectable, Logger } from '@nestjs/common';
-import { YoutubeStreamsrepository } from './youtube-streamsrepository/youtube-streamsrepository';
-import { CreateYoutubeStreamReqDto } from './dto/youtube-stream.dto';
-import { ChildProcessWithoutNullStreams, spawn } from 'child_process';
-import { Socket } from 'socket.io';
+import { ForbiddenException, Injectable, Logger } from '@nestjs/common';
+import { YoutubeStreamsrepository } from './youtube-streamsrepository/youtube-streams.repository';
+import { CreateYoutubeStreamReqDto, CreateYoutubeStreamPrismaInputDto, BroadcastStatus } from './dto/youtube-stream.dto';
+import { UsersService } from '../users/users.service';
 
 @Injectable()
 export class YoutubeStreamsService {
   private readonly logger = new Logger(YoutubeStreamsService.name);
 
-  constructor(private readonly youtubeStreamsRepo: YoutubeStreamsrepository) {}
+  constructor(
+    private readonly youtubeStreamsRepo: YoutubeStreamsrepository,
+    private readonly usersService: UsersService,
+  ) {}
 
   async createYoutubeStream(createYoutubeStreamReqDto: CreateYoutubeStreamReqDto, userId: number) {
-    await this.youtubeStreamsRepo.create({
-      title: createYoutubeStreamReqDto.title,
-      thumbnail: 'thumbnail',
-      streamStartTime: new Date(),
-      streamingUrl: 'streamingUrl',
-      user: {
-        connect: { id: userId },
-      },
-    });
+    const inputDto = new CreateYoutubeStreamPrismaInputDto(createYoutubeStreamReqDto.title, userId);
+    await this.youtubeStreamsRepo.create(inputDto);
   }
 
-  createFfmpegProcess(client: Socket, ffmpegMap: Map<string, ChildProcessWithoutNullStreams>) {
-    this.logger.log(`서버와 연결되었습니다.: ${client.id}`);
-    const streamKey = client.handshake.query.streamKey;
+  async startStream(youtubeStreamKey: string) {
+    this.logger.log(`stream ID: ${youtubeStreamKey}`);
 
-    if (typeof streamKey !== 'string') {
-      client.disconnect();
-      this.logger.error('잘못된 streamKey');
-      return;
+    // 스트림 키가 유효한지 판단
+    const existingUser = await this.usersService.findByStreamKey(youtubeStreamKey);
+
+    if (!existingUser) {
+      this.logger.warn(`No stream found with ID: ${youtubeStreamKey}`);
+      throw new ForbiddenException('존재하지 않는 스트림키 입니다.');
+    }
+    // 동시에 방송중인지 판단
+    if (existingUser.liveStatus) {
+      throw new ForbiddenException('이미 방송중인 스트림키 입니다.');
     }
 
-    //spawn 자체가 비동기(non-blocking) API return ChildProcess 객체(ffmpeg)를 돌려주고, 내부적으로 FFmpeg 프로세스는 백그라운드에서 실행됩니다
-    // prettier-ignore
-    const ffmpeg = spawn('ffmpeg', [
-      '-f','webm','-i','pipe:0',
+    // 방송 준비 상태 데이터가 있는지 판단
 
-      // 명시적 stream mapping
-      '-map','0:v:0','-map','0:a:0',
+    const existingLiveData = await this.youtubeStreamsRepo.getStreamReadyData(existingUser.id, BroadcastStatus.READY);
+    if (!existingLiveData) {
+      this.logger.warn(`스트리밍 방송 준비 데이터가 없습니다.: ${existingUser.id}`);
+      throw new ForbiddenException('방송 준비 상태가 아닙니다.');
+    }
+    await this.youtubeStreamsRepo.update(existingLiveData.id, BroadcastStatus.ON_AIR); // 방송 준비 상태를 true로 변경
+    await this.usersService.updateLiveStatus(existingUser.loginId, true); // 유저의 방송 상태를 true로 변경
 
-      // 영상 인코딩
-      '-c:v','libx264','-preset','veryfast','-profile:v','baseline','-g','30','-keyint_min','30','-sc_threshold','0',
-      // 오디오 인코딩
-      '-c:a','aac','-ar','48000','-b:a','128k',
-
-      // HLS가 이해 가능한 포맷
-      '-f','flv',`rtmp://nginx-hls/stream/${streamKey}`,
-    ]);
-
-    // ffmpeg 프로세스 생성이나 실행 중 오류 발생 시 처리
-    ffmpeg.on('error', (err) => {
-      this.logger.error(`❌ Failed 프로세스 생성 실패 streamKey ${streamKey}:`, err.message);
-      client.emit('❌ ffmpeg 에러');
-      client.disconnect();
-    });
-    // ffmpeg가 실행 중에 출력하는 로그, 경고, 에러 메시지을 한글로 처리
-    ffmpeg.stderr.setEncoding('utf8');
-    ffmpeg.stderr.on('data', (data) => {
-      this.logger.log(`FFmpeg stderr for streamKey ${streamKey} , ffmpeg : ${client.id}: ${data}`);
-    });
-
-    ffmpeg.on('close', (code) => {
-      this.logger.log(`FFmpeg process closed with code ${code} for streamKey ${streamKey}`);
-      ffmpegMap.delete(client.id);
-    });
-
-    ffmpegMap.set(client.id, ffmpeg);
+    // 방송 준비 상태를 ture로 변경
   }
 
-  closeFfmpegProcess(client: Socket, ffmpegMap: Map<string, ChildProcessWithoutNullStreams>) {
-    this.logger.log(`서버과 연결 종료되었습니다.: ${client.id}`);
-    const ffmpeg = ffmpegMap.get(client.id);
-    if (ffmpeg) {
-      ffmpeg.stdin.end();
-      ffmpeg.kill('SIGINT');
-      ffmpegMap.delete(client.id);
+  async endStream(youtubeStreamKey: string) {
+    const existingUser = await this.usersService.findByStreamKey(youtubeStreamKey);
+
+    if (!existingUser) {
+      this.logger.warn(`No stream found with ID: ${youtubeStreamKey}`);
+      throw new ForbiddenException('존재하지 않는 스트림키 입니다.');
     }
+    const existingLiveData = await this.youtubeStreamsRepo.getStreamReadyData(existingUser.id, BroadcastStatus.ON_AIR);
+    if (!existingLiveData) {
+      this.logger.warn(`스트리밍 방송 중 데이터가 없습니다.: ${existingUser.id}`);
+      throw new ForbiddenException('방송 중 상태가 아닙니다.');
+    }
+    await this.usersService.updateLiveStatus(existingUser.loginId, false); // 유저의 방송 상태를 true로 변경
+    await this.youtubeStreamsRepo.updateStreamEndTime(existingLiveData.id);
+
+    throw new Error('Method not implemented.');
   }
 
-  handleStream(clientId: string, data: Buffer, ffmpegMap: Map<string, ChildProcessWithoutNullStreams>): void {
-    this.logger.log(`라이브 데이터 전송 ${clientId}`);
-    // 라이브 시작시간 insert 해야함
-    const ffmpeg = ffmpegMap.get(clientId);
-
-    if (!ffmpeg || !ffmpeg.stdin.writable) {
-      this.logger.error(`FFmpeg process not found or not writable for ${clientId}`);
-      return;
-    }
-
-    try {
-      this.logger.log('======================== stream ========================');
-      ffmpeg.stdin.write(data);
-    } catch (err) {
-      const errMsg = err instanceof Error ? err.message : String(err);
-      this.logger.error(`FFmpeg stdin write error for ${clientId}: ${errMsg}`);
-    }
+  onPlayStop(streamKey: string) {
+    throw new Error('Method not implemented.');
+  }
+  onPlay(streamKey: string) {
+    throw new Error('Method not implemented.');
   }
 }

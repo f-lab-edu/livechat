@@ -13,6 +13,10 @@ void (async () => {
 
   const app = await NestFactory.create(AppModule, { httpsOptions });
 
+  // HTTP 서버 (RTMP용)
+  const httpApp = await NestFactory.create(AppModule, { cors: true });
+  await httpApp.listen(3000); // HTTP 포트 추가
+
   const config = new DocumentBuilder()
     .setTitle('LiveChat API')
     .setDescription('유튜브 클론 실식산 채팅 API 명세서')

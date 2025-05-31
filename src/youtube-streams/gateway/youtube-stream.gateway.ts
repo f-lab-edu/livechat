@@ -8,31 +8,28 @@ import {
   ConnectedSocket,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
-import { ChildProcessWithoutNullStreams } from 'child_process';
-import { YoutubeStreamsService } from '../youtube-streams.service';
+import { FfmpegStreamService } from './ffmpeg-stream.service';
 
 @WebSocketGateway({
   cors: { origin: '*' },
 })
 export class YoutubeStreamGateway implements OnGatewayConnection, OnGatewayDisconnect {
-  constructor(private readonly youtubeStreamService: YoutubeStreamsService) {}
+  constructor(private readonly ffmpegStreamService: FfmpegStreamService) {}
   @WebSocketServer()
   server: Server;
 
-  private ffmpegMap = new Map<string, ChildProcessWithoutNullStreams>();
-
   // 클라이언트가 Websocket 서버에 연결될 대 자동으로 호출
   handleConnection(client: Socket) {
-    this.youtubeStreamService.createFfmpegProcess(client, this.ffmpegMap);
+    this.ffmpegStreamService.createFfmpegProcess(client);
   }
 
   // 클라이언트가 Websocket 서버와 연결을 끊을 때 자동으로 호출
   handleDisconnect(client: Socket) {
-    this.youtubeStreamService.closeFfmpegProcess(client, this.ffmpegMap);
+    this.ffmpegStreamService.closeFfmpegProcess(client);
   }
 
   @SubscribeMessage('stream')
   handleStream(@MessageBody() data: Buffer, @ConnectedSocket() client: Socket) {
-    this.youtubeStreamService.handleStream(client.id, data, this.ffmpegMap);
+    this.ffmpegStreamService.handleStream(client.id, data);
   }
 }
