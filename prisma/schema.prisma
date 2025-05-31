@@ -18,6 +18,8 @@ model User {
   loginId   String   @unique
   loginPassword     String
   nickname     String
+  streamkey     String?
+  liveStatus   Boolean @default(false)
   streams       YoutubeStream[] // 1:N 관계
   streamStats   StreamStats[]   // 1:N 관계
   chats         Chat[]         // 1:N 관계$#
@@ -28,10 +30,11 @@ model YoutubeStream {
   user            User          @relation(fields: [userId], references: [id])
   userId             Int  
   title             String
-  streamStartTime    DateTime
+  streamStartTime    DateTime?
   streamEndTime      DateTime?
   streamingUrl      String
-  thumbnail         String?
+  thumbnail         String
+  liveReady     Int @default(0)
   stats           StreamStats[] // 1:N 관계
   chats           Chat[]       // 1:N 관계
 }
