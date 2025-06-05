@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <title>채팅방</title>
+    <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+  </head>
+  <body>
+    <h2>채팅방 입장</h2>
+    <input type="number" id="streamId" placeholder="방송 ID (youtubeStreamId)" />
+    <button onclick="joinRoom()">입장</button>
+    <div id="roomStatus"></div>
+    <div id="viewerCount">시청자 수: 0</div>
+
+    <h2>채팅</h2>
+    <input type="text" id="message" placeholder="메시지 입력" />
+    <button onclick="sendMessage()">전송</button>
+
+    <ul id="chatList"></ul>
+
+    <script>
+      // 실제 서버 주소로 변경하세요!
+      const socket = io('https://localhost/chat');
+
+      let currentRoomId = null;
+
+      function joinRoom() {
+        const streamId = document.getElementById('streamId').value;
+        if (!streamId) return alert('방송 ID를 입력하세요.');
+        socket.emit('joinRoom', { youtubeStreamId: Number(streamId) }, (msg) => {
+          document.getElementById('roomStatus').innerText = msg;
+          currentRoomId = streamId;
+          document.getElementById('chatList').innerHTML = '';
+        });
+      }
+
+      function sendMessage() {
+        const message = document.getElementById('message').value;
+        if (!currentRoomId) return alert('먼저 채팅방에 입장하세요.');
+        if (!message) return;
+        socket.emit('chat', { youtubeStreamId: Number(currentRoomId), message });
+        document.getElementById('message').value = '';
+      }
+
+      socket.on('chat', (msg) => {
+        // msg가 string 또는 객체일 수 있음
+        const li = document.createElement('li');
+        if (typeof msg === 'string') {
+          li.innerText = msg;
+        } else if (msg && msg.message) {
+          li.innerText = `[${msg.userId ?? '익명'}] ${msg.message}`;
+        }
+        document.getElementById('chatList').appendChild(li);
+      });
+
+      socket.on('viewerCount', (count) => {
+        document.getElementById('viewerCount').innerText = `시청자 수: ${count}`;
+      });
+    </script>
+  </body>
+</html>

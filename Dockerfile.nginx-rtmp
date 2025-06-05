@@ -1,0 +1,12 @@
+FROM tiangolo/nginx-rtmp:latest
+
+RUN apt-get update && \
+    apt-get install -y ffmpeg && \
+    rm -rf /var/lib/apt/lists/* && \
+    mkdir -p /opt/data/hls
+
+# nginx 설정 파일 복사
+# COPY ./nginx/nginx.conf /etc/nginx/nginx.conf.template
+
+# (필요시 권한 설정)
+# RUN chmod 644 /etc/nginx/nginx.conf.template

@@ -10,14 +10,7 @@ import { PrismaModule } from './prisma/prisma.module';
 import { AuthModule } from './auth/auth.module';
 
 @Module({
-  imports: [
-    UsersModule,
-    YoutubeStreamsModule,
-    ChatsModule,
-    StreamStatsModule,
-    PrismaModule,
-    AuthModule,
-  ],
+  imports: [UsersModule, YoutubeStreamsModule, ChatsModule, StreamStatsModule, PrismaModule, AuthModule],
   controllers: [AppController],
   providers: [AppService],
 })
