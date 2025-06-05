@@ -44,23 +44,5 @@ export class YoutubeStreamsController {
     return { code: 0 }; // 인증 성공
   }
 
-  //스트리밍 시청 시작
-  // @Post('on-play')
-  // async onPlay(@Body() body: OnPublishDto) {
-  //   const streamKey = body.name;
-
-  //   await this.youtubeStreamsService.onPlay(streamKey);
-
-  //   return { code: 0 }; // 인증 성공
-  // }
-
-  // // 스트르밍 시청 종료
-  // @Post('on-play-stop')
-  // async onPlayDone(@Body() body: OnPublishDto) {
-  //   const streamKey = body.name;
-  //   await this.youtubeStreamsService.onPlayStop(streamKey);
-  //   return { code: 0 }; // 인증 성공
-  // }
-
   // 스트리밍 중인 방송 리스트 조회
 }

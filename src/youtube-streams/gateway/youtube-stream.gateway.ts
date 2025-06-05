@@ -10,9 +10,7 @@ import {
 import { Server, Socket } from 'socket.io';
 import { FfmpegStreamService } from './ffmpeg-stream.service';
 
-@WebSocketGateway({
-  cors: { origin: '*' },
-})
+@WebSocketGateway({ cors: { origin: '*' }, namespace: 'stream' })
 export class YoutubeStreamGateway implements OnGatewayConnection, OnGatewayDisconnect {
   constructor(private readonly ffmpegStreamService: FfmpegStreamService) {}
   @WebSocketServer()
