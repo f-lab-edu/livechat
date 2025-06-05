@@ -62,11 +62,11 @@ export class YoutubeStreamsService {
 
     throw new Error('Method not implemented.');
   }
-
-  onPlayStop(streamKey: string) {
-    throw new Error('Method not implemented.');
-  }
-  onPlay(streamKey: string) {
-    throw new Error('Method not implemented.');
+  async findByYoutubeStreamId(youtubeStreamId: number) {
+    const youtubeStream = await this.youtubeStreamsRepo.findByYoutubeStreamId(youtubeStreamId);
+    if (!youtubeStream) {
+      throw new ForbiddenException('존재하지 않는 스트림입니다.');
+    }
+    return youtubeStream;
   }
 }

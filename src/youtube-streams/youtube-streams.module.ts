@@ -10,5 +10,6 @@ import { UsersModule } from '../users/users.module';
   imports: [UsersModule],
   controllers: [YoutubeStreamsController],
   providers: [YoutubeStreamsService, YoutubeStreamsrepository, YoutubeStreamGateway, FfmpegStreamService],
+  exports: [YoutubeStreamsService],
 })
 export class YoutubeStreamsModule {}
