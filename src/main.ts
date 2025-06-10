@@ -7,6 +7,8 @@ import { LoggingInterceptor } from './interceptors/logging.interceptor';
 void (async () => {
   const httpApp = await NestFactory.create(AppModule, { cors: true });
 
+  httpApp.setGlobalPrefix('/api');
+
   const config = new DocumentBuilder()
     .setTitle('LiveChat API')
     .setDescription('유튜브 클론 실시간 채팅 API 명세서')
@@ -15,7 +17,7 @@ void (async () => {
     .build();
 
   const document = SwaggerModule.createDocument(httpApp, config);
-  SwaggerModule.setup('swagger', httpApp, document);
+  SwaggerModule.setup('api/swagger', httpApp, document);
   httpApp.useGlobalInterceptors(new LoggingInterceptor());
   httpApp.useGlobalPipes(new ValidationPipe());
   httpApp.enableShutdownHooks();

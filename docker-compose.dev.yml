@@ -4,8 +4,6 @@ services:
       context: .
       dockerfile: Dockerfile
     container_name: livechat-backend
-    ports:
-      - '3000:3000'
     depends_on:
       - postgres
     env_file:
@@ -28,11 +26,11 @@ services:
     ports:
       - '5555:5555'
     volumes:
-      - .:/app
+      - .:/app:ro
     depends_on:
       - postgres
     env_file:
-      - .env
+      - .env.ci
     networks:
       - app-network
 
@@ -58,7 +56,6 @@ services:
     ports:
       - '2935:1935'
       - '443:443'
-      - '80:80'
     volumes:
       - ./nginx/nginx.dev.conf:/etc/nginx/nginx.conf
       - ./cert:/etc/nginx/cert
