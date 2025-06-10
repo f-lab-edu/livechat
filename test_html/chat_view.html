@@ -16,6 +16,7 @@
     <h2>방송 입장 및 시청</h2>
     <input type="number" id="streamId" placeholder="방송 ID (youtubeStreamId)" />
     <input type="text" id="streamKey" placeholder="스트림키 (예: test123)" />
+    <input type="text" id="accessToken" placeholder="액세스 토큰" />
     <button onclick="joinAndPlay()">입장 및 방송 시청</button>
     <div id="roomStatus"></div>
     <div id="viewerCount">시청자 수: 0</div>
@@ -35,6 +36,7 @@
       function joinAndPlay() {
         const streamId = document.getElementById('streamId').value;
         const streamKey = document.getElementById('streamKey').value;
+        const accessToken = document.getElementById('accessToken').value;
         if (!streamId) return alert('방송 ID를 입력하세요.');
         if (!streamKey) return alert('스트림키를 입력하세요.');
 
@@ -55,7 +57,11 @@
 
         // 채팅 소켓 연결 및 입장
         if (socket) socket.disconnect();
-        socket = io('http://localhost:3000/chat'); // 서버 주소에 맞게 수정
+        socket = io('http://localhost:3000/chat', {
+          query: {
+            accessToken: accessToken,
+          },
+        }); // 서버 주소에 맞게 수정
         socket.on('connect', () => {
           socket.emit('joinRoom', { youtubeStreamId: Number(streamId) }, (msg) => {
             document.getElementById('roomStatus').innerText = msg;

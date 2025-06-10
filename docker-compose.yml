@@ -11,7 +11,7 @@ services:
     volumes:
       - .:/app
       - ./cert:/app/cert # <-- 인증서 파일 바인딩
-    command: sh -c "npx prisma db push && npx prisma generate && npm run start:dev"
+    command: sh -c "npx prisma db push && npx prisma generate && npm run build && npm run start:prod"
     environment:
       - TZ=Asia/Seoul
       - CHOKIDAR_USEPOLLING=true
