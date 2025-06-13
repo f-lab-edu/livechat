@@ -16,13 +16,13 @@ services:
     networks:
       - app-network
 
-    prisma-studio:
-      image: prismagraphql/prisma
-      container_name: prisma-studio
-      ports:
-        - '5555:5555'
-      networks:
-        - app-network
+  prisma-studio:
+    image: prismagraphql/prisma
+    container_name: prisma-studio
+    ports:
+      - '5555:5555'
+    networks:
+      - app-network
 
   nginx:
     build:
