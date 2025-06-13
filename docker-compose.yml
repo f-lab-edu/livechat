@@ -16,6 +16,22 @@ services:
     networks:
       - app-network
 
+  prisma-studio:
+    build:
+      context: .
+    container_name: prisma-studio
+    command: npx prisma studio
+    ports:
+      - '5555:5555'
+    volumes:
+      - .:/app:ro
+    depends_on:
+      - postgres
+    env_file:
+      - .env
+    networks:
+      - app-network
+
   nginx:
     build:
       context: .
