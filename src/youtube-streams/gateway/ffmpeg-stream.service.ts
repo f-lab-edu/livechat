@@ -1,12 +1,15 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ChildProcessWithoutNullStreams, spawn } from 'child_process';
 import { Socket } from 'socket.io';
+import { JwtPayload } from '../../auth/jwt-strategy';
+import { UsersService } from '../../users/users.service';
 
 @Injectable()
 export class FfmpegStreamService {
   private readonly logger = new Logger(FfmpegStreamService.name);
 
   private readonly ffmpegMap = new Map<string, ChildProcessWithoutNullStreams>();
+  constructor(private readonly usersService: UsersService) {}
 
   createFfmpegProcess(client: Socket) {
     this.logger.log(`서버와 연결되었습니다.: ${client.id}`);
@@ -65,13 +68,35 @@ export class FfmpegStreamService {
     }
   }
 
-  handleStream(clientId: string, data: Buffer): void {
-    this.logger.log(`라이브 데이터 전송 ${clientId}`);
+  async handleStream(client: Socket, data: Buffer, user: JwtPayload): Promise<void> {
+    this.logger.log(`라이브 데이터 전송 ${client.id}`);
     // 라이브 시작시간 insert 해야함
-    const ffmpeg = this.ffmpegMap.get(clientId);
+    const ffmpeg = this.ffmpegMap.get(client.id);
+
+    const clientStreamKey = client.handshake.query.streamKey;
+
+    if (typeof clientStreamKey !== 'string') {
+      client.disconnect();
+      this.logger.error('잘못된 streamKey');
+      return;
+    }
+
+    const userStreamKey = await this.usersService.getStreamKeyfindByLoginId(user.loginId);
+    this.logger.log(`클라이언트 streamKey: ${clientStreamKey}, 사용자 streamKey: ${userStreamKey}`);
+    if (!userStreamKey) {
+      this.logger.error(`사용자의 streamKey가 없습니다: ${user.loginId}`);
+      client.emit('error', 'StreamKey가 없습니다');
+      return;
+    }
+
+    if (userStreamKey !== clientStreamKey) {
+      this.logger.error(`StreamKey mismatch for ${client.id}. 클라이언트의 streamKey: ${clientStreamKey} / 사용자 streamKey: ${userStreamKey}`);
+      client.emit('error', 'StreamKey 검증 실패');
+      return;
+    }
 
     if (!ffmpeg || !ffmpeg.stdin.writable) {
-      this.logger.error(`FFmpeg process not found or not writable for ${clientId}`);
+      this.logger.error(`FFmpeg process not found or not writable for ${client.id}`);
       return;
     }
 
@@ -80,7 +105,7 @@ export class FfmpegStreamService {
       ffmpeg.stdin.write(data);
     } catch (err) {
       const errMsg = err instanceof Error ? err.message : String(err);
-      this.logger.error(`FFmpeg stdin write error for ${clientId}: ${errMsg}`);
+      this.logger.error(`FFmpeg stdin write error for ${client.id}: ${errMsg}`);
     }
   }
 }

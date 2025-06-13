@@ -60,7 +60,7 @@
           document.getElementById('preview').srcObject = stream;
 
           socket = io('https://localhost/stream', {
-            query: { streamKey },
+            query: { streamKey, accessToken: document.getElementById('accessToken').value },
             transports: ['websocket'],
           });
 

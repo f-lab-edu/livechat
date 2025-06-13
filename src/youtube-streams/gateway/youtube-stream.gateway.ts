@@ -9,6 +9,8 @@ import {
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { FfmpegStreamService } from './ffmpeg-stream.service';
+import { CurrentSocketUser } from '../../auth/current-user.decorator';
+import { JwtPayload } from '../../auth/jwt-strategy';
 
 @WebSocketGateway({ cors: { origin: '*' }, namespace: 'stream' })
 export class YoutubeStreamGateway implements OnGatewayConnection, OnGatewayDisconnect {
@@ -27,7 +29,7 @@ export class YoutubeStreamGateway implements OnGatewayConnection, OnGatewayDisco
   }
 
   @SubscribeMessage('stream')
-  handleStream(@MessageBody() data: Buffer, @ConnectedSocket() client: Socket) {
-    this.ffmpegStreamService.handleStream(client.id, data);
+  handleStream(@MessageBody() data: Buffer, @ConnectedSocket() client: Socket, @CurrentSocketUser() user: JwtPayload) {
+    this.ffmpegStreamService.handleStream(client, data, user);
   }
 }
