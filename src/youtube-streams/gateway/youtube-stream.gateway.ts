@@ -29,7 +29,7 @@ export class YoutubeStreamGateway implements OnGatewayConnection, OnGatewayDisco
   }
 
   @SubscribeMessage('stream')
-  handleStream(@MessageBody() data: Buffer, @ConnectedSocket() client: Socket, @CurrentSocketUser() user: JwtPayload) {
-    this.ffmpegStreamService.handleStream(client, data, user);
+  async handleStream(@MessageBody() data: Buffer, @ConnectedSocket() client: Socket, @CurrentSocketUser() user: JwtPayload) {
+    await this.ffmpegStreamService.handleStream(client, data, user);
   }
 }
