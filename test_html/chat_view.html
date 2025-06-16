@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <title>Live Stream & Chat</title>
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+    <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+    <style>
+      video {
+        background-color: black;
+        border: 1px solid #ccc;
+      }
+    </style>
+  </head>
+  <body>
+    <h2>방송 입장 및 시청</h2>
+    <!-- <input type="number" id="streamId" placeholder="방송 ID (youtubeStreamId)" /> -->
+    <input type="text" id="streamKey" placeholder="스트림키 (예: test123)" />
+    <input type="text" id="accessToken" placeholder="액세스 토큰" />
+    <button onclick="joinAndPlay()">입장 및 방송 시청</button>
+    <div id="roomStatus"></div>
+    <div id="viewerCount">시청자 수: 0</div>
+
+    <h2>채팅</h2>
+    <input type="text" id="message" placeholder="메시지 입력" />
+    <button onclick="sendMessage()">전송</button>
+    <ul id="chatList"></ul>
+
+    <h1>🎥 Live HLS Player</h1>
+    <video id="video" width="720" controls autoplay muted playsinline style="display: none"></video>
+
+    <script>
+      let socket = null;
+      let currentRoomId = null;
+
+      function joinAndPlay() {
+        // const streamId = document.getElementById('streamId').value;
+        const streamKey = document.getElementById('streamKey').value;
+        const accessToken = document.getElementById('accessToken').value;
+        // if (!streamId) return alert('방송 ID를 입력하세요.');
+        if (!streamKey) return alert('스트림키를 입력하세요.');
+
+        // HLS 스트림 URL 생성
+        const variant = '_720p2628kbs';
+        const videoSrc = `https://liveschats.store/hls/${streamKey}${variant}/index.m3u8`;
+
+        // 영상 재생
+        const video = document.getElementById('video');
+        video.style.display = '';
+        if (Hls.isSupported()) {
+          const hls = new Hls();
+          hls.loadSource(videoSrc);
+          hls.attachMedia(video);
+        } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+          video.src = videoSrc;
+        }
+
+        // 채팅 소켓 연결 및 입장
+        if (socket) socket.disconnect();
+        socket = io('https://liveschats.store/chat', {
+          query: {
+            accessToken: accessToken,
+          },
+        }); // 서버 주소에 맞게 수정
+        socket.on('connect', () => {
+          socket.emit('joinRoom', { youtubeStreamId: Number(streamId) }, (msg) => {
+            document.getElementById('roomStatus').innerText = msg;
+            currentRoomId = streamId;
+            document.getElementById('chatList').innerHTML = '';
+          });
+        });
+
+        socket.on('chat', (msg) => {
+          const li = document.createElement('li');
+          if (typeof msg === 'string') {
+            li.innerText = msg;
+          } else if (msg && msg.message) {
+            li.innerText = `[${msg.userId ?? '익명'}] ${msg.message}`;
+          }
+          document.getElementById('chatList').appendChild(li);
+        });
+
+        socket.on('viewerCount', (count) => {
+          document.getElementById('viewerCount').innerText = `시청자 수: ${count}`;
+        });
+      }
+
+      function sendMessage() {
+        const message = document.getElementById('message').value;
+        if (!currentRoomId) return alert('먼저 방송에 입장하세요.');
+        if (!accessToken) return alert('액세스 토큰을 입력하세요.');
+        if (!message) return;
+        socket.emit('chat', { youtubeStreamId: Number(currentRoomId), message });
+        document.getElementById('message').value = '';
+      }
+    </script>
+  </body>
+</html>

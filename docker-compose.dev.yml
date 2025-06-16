@@ -1,0 +1,73 @@
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: livechat-backend
+    depends_on:
+      - postgres
+    env_file:
+      - .env.ci
+    volumes:
+      - .:/app
+    command: sh -c "npx prisma db push && npx prisma generate && npm run start:dev"
+    environment:
+      - TZ=Asia/Seoul
+      - CHOKIDAR_USEPOLLING=true
+      - CHOKIDAR_INTERVAL=1000
+    networks:
+      - app-network
+
+  prisma-studio:
+    build:
+      context: .
+    container_name: prisma-studio
+    command: npx prisma studio
+    ports:
+      - '5555:5555'
+    volumes:
+      - .:/app:ro
+    depends_on:
+      - postgres
+    env_file:
+      - .env.ci
+    networks:
+      - app-network
+
+  postgres:
+    image: postgres:15
+    container_name: postgres-db
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_HOST_AUTH_METHOD: trust
+    ports:
+      - '5432:5432'
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - app-network
+  nginx:
+    build:
+      context: .
+      dockerfile: Dockerfile.nginx-rtmp
+    container_name: nginx-hls
+    ports:
+      - '2935:1935'
+      - '443:443'
+    volumes:
+      - ./nginx/nginx.dev.conf:/etc/nginx/nginx.conf
+      - ./cert:/etc/nginx/cert
+    restart: always
+    networks:
+      - app-network
+    environment:
+      - TZ=Asia/Seoul
+
+volumes:
+  pgdata:
+
+networks:
+  app-network:
+    driver: bridge
