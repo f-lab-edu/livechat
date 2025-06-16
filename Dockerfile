@@ -17,4 +17,4 @@ RUN npm install
 RUN mkdir -p cert
 # CMD ["sh", "-c", "npx prisma db push && npm run start:dev"]
 
-CMD ["npm", "run", "start:dev"]
+# CMD ["npm", "run", "start:dev"]
