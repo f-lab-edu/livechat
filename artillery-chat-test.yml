@@ -1,0 +1,31 @@
+config:
+  target: 'ws://localhost:3000/chat'
+  phases:
+    - duration: 10
+      arrivalRate: 1000
+  ws:
+    path: '/socket.io/?EIO=4&transport=websocket'
+
+functions:
+  generateMessage:
+    - set:
+        message: '{{ randomString(10) }}'
+
+scenarios:
+  - engine: 'socketio'
+    flow:
+      - emit:
+          channel: 'joinRoom'
+          data:
+            youtubeStreamId: 1
+
+      - loop:
+          count: 10
+          steps:
+            - function: 'generateMessage'
+            - emit:
+                channel: 'chat'
+                data:
+                  youtubeStreamId: 1
+                  message: '{{ message }}'
+            - think: 1
