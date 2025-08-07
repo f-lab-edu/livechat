@@ -1,31 +1,37 @@
 config:
-  target: 'ws://localhost:3000/chat'
+  target: 'http://localhost:3000' # '/chat' 경로 제거
   phases:
     - duration: 10
-      arrivalRate: 1000
-  ws:
-    path: '/socket.io/?EIO=4&transport=websocket'
+      arrivalRate: 1
 
-functions:
-  generateMessage:
-    - set:
-        message: '{{ randomString(10) }}'
+  # Socket.IO 설정을 여기서 제거하고 processor에서 처리
+# before:
+#   flow:
+#     - post:
+#         url: users/login
+#         json:
+#           username: user001
+#           password: password123
+
+# payload:
+#   path: './users.csv'
+#   fields: [userId, loginId]
 
 scenarios:
-  - engine: 'socketio'
+  - engine: socketio
+    namespace: 'chat'
     flow:
       - emit:
           channel: 'joinRoom'
-          data:
-            youtubeStreamId: 1
+          data: { youtubeStreamId: 2 }
 
-      - loop:
-          count: 10
-          steps:
-            - function: 'generateMessage'
-            - emit:
-                channel: 'chat'
-                data:
-                  youtubeStreamId: 1
-                  message: '{{ message }}'
-            - think: 1
+      # - loop:
+      #     - count: 1
+      #       steps:
+      #         - function: 'generateMessage'
+      #         - emit:
+      #             channel: 'chat'
+      #             data:
+      #               youtubeStreamId: 2
+      #               message: '{{ message }}'
+      #         - think: 1

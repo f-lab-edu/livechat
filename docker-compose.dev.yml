@@ -48,22 +48,6 @@ services:
       - pgdata:/var/lib/postgresql/data
     networks:
       - app-network
-  nginx:
-    build:
-      context: .
-      dockerfile: Dockerfile.nginx-rtmp
-    container_name: nginx-hls
-    ports:
-      - '2935:1935'
-      - '443:443'
-    volumes:
-      - ./nginx/nginx.dev.conf:/etc/nginx/nginx.conf
-      - ./cert:/etc/nginx/cert
-    restart: always
-    networks:
-      - app-network
-    environment:
-      - TZ=Asia/Seoul
 
 volumes:
   pgdata:
