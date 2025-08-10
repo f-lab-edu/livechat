@@ -3,10 +3,12 @@ import { ChatsRepository } from './chatRepository/chats.repository';
 import { YoutubeStreamsService } from '../youtube-streams/youtube-streams.service';
 import { Socket } from 'socket.io';
 import { JwtPayload } from '../auth/jwt-strategy';
+import { createKoProfanityFilter } from './filter';
 
 @Injectable()
 export class ChatsService {
   private readonly logger = new Logger(ChatsService.name);
+  private readonly profanity = createKoProfanityFilter({ placeholder: '*' });
 
   constructor(
     private readonly chatsRepository: ChatsRepository,
@@ -16,15 +18,19 @@ export class ChatsService {
   async createChat(youtubeStreamId: number, message: string, userId: number): Promise<void> {
     // 여기에 채팅 메시지를 저장하는 로직을 구현합니다.
     this.logger.log(`채팅 메시지 저장: ${message} (Stream ID: ${youtubeStreamId}, userId ID: ${userId})`);
+    const { found, cleaned, matches } = this.profanity.filter(message);
+    if (found) {
+      this.logger.warn(`욕설 필터 적용: ${matches.join(', ')} :: "${message}" -> "${cleaned}"`);
+    }
+
     // 예시로 로그에 출력
-    await this.chatsRepository.createChat(youtubeStreamId, message, userId);
+    await this.chatsRepository.createChat(youtubeStreamId, cleaned, userId);
   }
 
   async joinRoom(client: Socket, youtubeStreamId: number, user?: JwtPayload): Promise<void> {
     // 채팅방에 입장하는 로직을 구현합니다.
     this.logger.log(`유저 ${user?.userId ?? null}가 채팅방에 입장: Stream ID ${youtubeStreamId}`);
     await client.join(`room-${youtubeStreamId}`);
-
     // 예시로 로그에 출력
   }
 
