@@ -5,8 +5,8 @@ const prisma = new PrismaClient();
 async function main() {
   // 1. 유저 1000명 bulk 생성
   const usersData = Array.from({ length: 1000 }, (_, i) => ({
-    loginId: `testuser${i + 1}`,
-    loginPassword: 'password123',
+    loginId: `atestuser${i + 1}`,
+    loginPassword: '$2b$10$2fgaAgRltpmEQPuzrk5N/.8Irq.zbtF7fg7ukjoTdXXBwRzkCBDIe',
     nickname: `테스트유저${i + 1}`,
     streamkey: `testkey${i + 1}`,
     liveStatus: false,

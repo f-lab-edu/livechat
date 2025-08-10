@@ -38,11 +38,11 @@ export class UsersService {
         throw new UnauthorizedException('Invalid credentials');
       }
 
-      // const isPasswordValid = await bcrypt.compare(loginUserDto.loginPassword, user.loginPassword);
+      const isPasswordValid = await bcrypt.compare(loginUserDto.loginPassword, user.loginPassword);
 
-      // if (!isPasswordValid) {
-      //   throw new UnauthorizedException('Invalid credentials');
-      // }
+      if (!isPasswordValid) {
+        throw new UnauthorizedException('Invalid credentials');
+      }
 
       const payload: JwtPayload = { userId: user.id, loginId: user.loginId };
       return this.jwtService.sign(payload);
