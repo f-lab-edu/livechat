@@ -1,8 +1,18 @@
 config:
   target: 'http://localhost:3000'
   phases:
-    - duration: 60 # 테스트 총 길이(예: 10분)
-      arrivalCount: 1 # 딱 1명의 VU만 생성 (한 명의 유저)
+    - duration: 5 # 5초 동안
+      arrivalCount: 10
+    - duration: 10
+      arrivalCount: 40
+    - duration: 10
+      arrivalCount: 100
+    - duration: 10
+      arrivalCount: 200
+    - duration: 10
+      arrivalCount: 300
+    - duration: 10
+      arrivalCount: 400
   socketio:
     path: '/socket.io'
   processor: './auth-processor.js'
@@ -17,6 +27,8 @@ config:
   variables:
     targetRoomId: 1
     roomCount: 2 # 방 개수
+    holdMs: 15000 # 방에 머무는 시간(2초)
+    syncDelayMs: 0
 
 scenarios:
   - name: '유저 한명이 10개 채팅방 접속'
@@ -53,20 +65,25 @@ scenarios:
           data:
             youtubeStreamId: '{{ targetRoomId }}'
             token: '{{ accessToken }}'
-
+      - function: 'hold' # 현재 방 설정
+      - namespace: '/chat'
+        emit:
+          channel: 'leaveRoom'
+          data:
+            youtubeStreamId: '{{ targetRoomId }}'
       # 4) 2초마다 다음 방으로 chat (무한 루프)
-      - function: 'initCursor'
-      - function: 'setNow' # currentRoom 설정
-      - loop:
-          - function: 'pickNextRoom' # currentRoom 설정
-          - namespace: '/chat'
-            emit:
-              channel: 'chat'
-              data:
-                youtubeStreamId: '{{ currentRoom }}'
-                message: 'RR {{ loginId }} chat to room {{ currentRoom }} at {{ nowISO }}'
-                token: '{{ accessToken }}'
-          - think: 0.01 # 2초마다 한 건
-        count: 1000
+      # - function: 'initCursor'
+      # - function: 'setNow' # currentRoom 설정
+      # - loop:
+      #     - function: 'pickNextRoom' # currentRoom 설정
+      #     - namespace: '/chat'
+      #       emit:
+      #         channel: 'chat'
+      #         data:
+      #           youtubeStreamId: '{{ currentRoom }}'
+      #           message: 'RR {{ loginId }} chat to room {{ currentRoom }} at {{ nowISO }}'
+      #           token: '{{ accessToken }}'
+      #     - think: 0.01 # 2초마다 한 건
+      #   count: 1000
 
       #count를 생략하면 무한 반복됨(테스트 duration 동안). :contentReference[oaicite:1]{index=1}

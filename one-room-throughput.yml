@@ -1,0 +1,50 @@
+config:
+  target: 'http://localhost:3000'
+  phases:
+    - duration: 1
+      arrivalCount: 100 # 40명 동시 시작(거의 동시에)
+  socketio:
+    path: '/socket.io'
+  processor: './auth-processor.js'
+
+  payload:
+    path: './users.csv'
+    fields: [loginId, loginPassword]
+    order: sequence
+    skipHeader: true
+
+  variables:
+    targetRoomId: 1
+    syncDelayMs: 1500 # 모두 같은 시각에 한 번 더 맞춰서 시작
+
+scenarios:
+  - name: 'one-room throughput'
+    engine: socketio
+    flow:
+      - post:
+          url: '/api/users/login'
+          json: { loginId: '{{ loginId }}', loginPassword: '{{ loginPassword }}' }
+          capture: [{ json: '$.accessToken', as: accessToken }]
+
+      - namespace: '/chat'
+        emit:
+          channel: 'joinRoom'
+          data: { youtubeStreamId: '{{ targetRoomId }}', token: '{{ accessToken }}' }
+
+      - function: 'syncStart' # 동시 발사
+
+      - loop:
+          - namespace: '/chat'
+            emit:
+              channel: 'chat'
+              data:
+                youtubeStreamId: '{{ targetRoomId }}'
+                message: 'burst {{$loopCount}} by {{ loginId }}'
+                token: '{{ accessToken }}'
+          - think: 0 # 0~0.01로 조절
+        count: 100 # ▲ 유저당 메시지 수(M). 점점 올려가며 한계 확인
+
+      - namespace: '/chat'
+        emit:
+          channel: 'leaveRoom'
+          data: { youtubeStreamId: '{{ targetRoomId }}' }

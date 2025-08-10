@@ -1,0 +1,49 @@
+config:
+  target: 'http://localhost:3000'
+  phases:
+    - duration: 5
+      arrivalCount: 100 # 예: 100명
+  socketio:
+    path: '/socket.io'
+  processor: './auth-processor.js'
+
+  payload:
+    path: './users.csv'
+    fields: [loginId, loginPassword, roomId] # ★ roomId 포함
+    order: sequence
+    skipHeader: true
+
+  variables:
+    syncDelayMs: 1500
+
+scenarios:
+  - name: 'multi-room scale'
+    engine: socketio
+    flow:
+      - post:
+          url: '/api/users/login'
+          json: { loginId: '{{ loginId }}', loginPassword: '{{ loginPassword }}' }
+          capture: [{ json: '$.accessToken', as: accessToken }]
+
+      - namespace: '/chat'
+        emit:
+          channel: 'joinRoom'
+          data: { youtubeStreamId: '{{ roomId }}', token: '{{ accessToken }}' }
+
+      - function: 'syncStart' # 각 방에 분산되어도 같은 시각에 시작 → TPS 관찰 쉽다
+
+      - loop:
+          - namespace: '/chat'
+            emit:
+              channel: 'chat'
+              data:
+                youtubeStreamId: '{{ roomId }}'
+                message: 'msg {{$loopCount}} by {{ loginId }} in room {{ roomId }}'
+                token: '{{ accessToken }}'
+          - think: 0.01
+        count: 50 # 유저당 메시지 수
+
+      - namespace: '/chat'
+        emit:
+          channel: 'leaveRoom'
+          data: { youtubeStreamId: '{{ roomId }}' }

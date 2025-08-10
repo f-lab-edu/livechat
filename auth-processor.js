@@ -4,7 +4,25 @@ module.exports = {
   initCursor,
   pickNextRoom,
   setNow, // ← 추가
+  syncStart,
+  hold,
 };
+
+let GLOBAL_START_AT = null;
+
+function syncStart(context, events, done) {
+  // 모든 VU를 같은 시각까지 대기시켜 '동시성'을 맞춤
+  const delayMs = Number(context.vars.syncDelayMs ?? 1500);
+  if (!GLOBAL_START_AT) GLOBAL_START_AT = Date.now() + delayMs;
+  const wait = GLOBAL_START_AT - Date.now();
+  setTimeout(done, wait > 0 ? wait : 0);
+}
+
+function hold(context, events, done) {
+  // 연결을 유지하기 위한 단순 wait
+  const ms = Number(context.vars.holdMs ?? 10000);
+  setTimeout(done, ms);
+}
 
 function setupRooms(context, events, done) {
   const N = Number(context.vars.roomCount);
@@ -32,67 +50,4 @@ function setNow(context, events, done) {
   return done();
 }
 
-// config:
-//   target: 'http://localhost:3000'
-//   phases:
-//     - duration: 60 # 테스트 총 길이(예: 10분)
-//       arrivalCount: 10 # 딱 1명의 VU만 생성 (한 명의 유저)
-//   socketio:
-//     path: '/socket.io'
-//   processor: './auth-processor.js'
-
-//   payload: # ★ 각 VU에 계정 1개씩 할당
-//     path: './users.csv'
-//     fields:
-//       - loginId
-//       - loginPassword
-//     order: sequence # 순서대로 할당 (랜덤하려면 random)
-//     skipHeader: true
-
-// scenarios:
-//   - name: '유저 한명이 10개 채팅방 접속'
-//     engine: socketio
-//     flow:
-//       # 1) 로그인 & 토큰 캡처
-//       - post:
-//           url: '/api/users/login'
-//           json:
-//             loginId: '{{ loginId }}'
-//             loginPassword: '{{ loginPassword }}'
-//           capture:
-//             - json: '$.accessToken' # 응답 구조에 맞게 필요 시 수정($.data.accessToken 등)
-//               as: accessToken
-//               log: '{{ loginId }} logged in, accessToken: {{ accessToken }}'
-
-//       # 2) 1..roomCount 배열 만들기
-//       - function: 'setupRooms'
-
-//       # 3) 모든 방에 한 번씩 joinRoom
-//       - loop:
-//           - namespace: '/chat'
-//             emit:
-//               channel: 'joinRoom'
-//               data:
-//                 youtubeStreamId: '{{ $loopElement }}'
-//                 token: '{{ accessToken }}'
-//           - think: 0.01 # 폭주 방지용(선택)
-//         over: 'rooms' # setupRooms가 만든 배열
-
-//       # 4) 2초마다 다음 방으로 chat (무한 루프)
-//       - function: 'initCursor'
-//       - loop:
-//           - function: 'pickNextRoom' # currentRoom 설정
-//           - function: 'setNow' # ← 매 전송 직전에 현재 시각 갱신
-//           - namespace: '/chat'
-//             emit:
-//               channel: 'chat'
-//               data:
-//                 youtubeStreamId: '{{ currentRoom }}'
-//                 message: 'RR chat to room {{ currentRoom }} at {{ nowISO }}'
-//                 token: '{{ accessToken }}'
-//           - think: 2 # 2초마다 한 건
-//         count: 100
-
-// 3 eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjYsImxvZ2luSWQiOiJ0ZXN0dXNlcjYiLCJpYXQiOjE3NTQ3Mzk4MjAsImV4cCI6MTc1NDc0MzQyMH0.ta_PdoZj-AtavnfV2bL_5cbDUMyFu_FMEabVN7m1dx4
-
-// 39 token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjM5LCJsb2dpbklkIjoidGVzdHVzZXIzOSIsImlhdCI6MTc1NDczNTEzMiwiZXhwIjoxNzU0NzM4NzMyfQ.fdcCJI2hA8NuoxZPi7M9uyPMNxWn3rGfUjkifoGr2Ds
+// eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjUsImxvZ2luSWQiOiJ0ZXN0dXNlcjUiLCJpYXQiOjE3NTQ3OTAyMDAsImV4cCI6MTc1NDgzMzQwMH0.qkJcTgkW6XzM0Pe1zSBkspj_A1CguC_blC1bKxBWauA

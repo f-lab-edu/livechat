@@ -27,7 +27,6 @@ export class ChatGateway {
     @ConnectedSocket() client: Socket,
     //  @OptionalSocketUser() user?: JwtPayload,
   ): Promise<string> {
-    console.log(data.token);
     const user = jwt.verify(data.token, process.env.JWT_SECRET!) as JwtPayload;
     await this.chatsService.joinRoom(client, data.youtubeStreamId, user);
     await this.broadcastViewerCount(data.youtubeStreamId);
