@@ -23,7 +23,6 @@ export const CurrentSocketUser = createParamDecorator((data: unknown, context: E
 
 export const OptionalSocketUser = createParamDecorator((data: unknown, context: ExecutionContext) => {
   const client = context.switchToWs().getClient<Socket>();
-  console.log('client', client.handshake.auth.token);
   const token = (client.handshake as { auth: { token?: string } }).auth?.token;
   if (!token) return undefined;
   try {

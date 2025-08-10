@@ -8,6 +8,7 @@
   <body>
     <h2>채팅방 입장</h2>
     <input type="number" id="streamId" placeholder="방송 ID (youtubeStreamId)" />
+    <input type="text" id="accessToken" placeholder="액세스 토큰" />
     <button onclick="joinRoom()">입장</button>
     <div id="roomStatus"></div>
     <div id="viewerCount">시청자 수: 0</div>
@@ -20,9 +21,14 @@
 
     <script>
       // 실제 서버 주소로 변경하세요!
-      const socket = io('https://localhost/chat');
+      const socket = io('ws://localhost:3000/chat', {
+        query: {
+          accessToken: accessToken,
+        },
+      });
 
       let currentRoomId = null;
+      const accessToken = document.getElementById('accessToken').value;
 
       function joinRoom() {
         const streamId = document.getElementById('streamId').value;

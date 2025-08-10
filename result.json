@@ -1,0 +1,851 @@
+{
+  "aggregate": {
+    "counters": {
+      "vusers.created_by_name.로그인 후 socket.io 채팅 시나리오": 120,
+      "vusers.created": 120,
+      "http.requests": 120,
+      "http.codes.404": 120,
+      "http.responses": 120,
+      "http.downloaded_bytes": 9000,
+      "plugins.metrics-by-endpoint./users/login.codes.404": 120,
+      "errors.Failed capture or match": 120,
+      "vusers.failed": 120
+    },
+    "rates": {
+      "http.request_rate": 2
+    },
+    "firstCounterAt": 1754586292275,
+    "firstHistogramAt": 1754586292294,
+    "lastCounterAt": 1754586351328,
+    "lastHistogramAt": 1754586351328,
+    "firstMetricAt": 1754586292275,
+    "lastMetricAt": 1754586351328,
+    "period": 1754586350000,
+    "summaries": {
+      "http.response_time": {
+        "min": 0,
+        "max": 1,
+        "count": 120,
+        "mean": 0.6,
+        "p50": 1,
+        "median": 1,
+        "p75": 1,
+        "p90": 1,
+        "p95": 1,
+        "p99": 1,
+        "p999": 1
+      },
+      "http.response_time.4xx": {
+        "min": 0,
+        "max": 1,
+        "count": 120,
+        "mean": 0.6,
+        "p50": 1,
+        "median": 1,
+        "p75": 1,
+        "p90": 1,
+        "p95": 1,
+        "p99": 1,
+        "p999": 1
+      },
+      "plugins.metrics-by-endpoint.response_time./users/login": {
+        "min": 0,
+        "max": 1,
+        "count": 120,
+        "mean": 0.6,
+        "p50": 1,
+        "median": 1,
+        "p75": 1,
+        "p90": 1,
+        "p95": 1,
+        "p99": 1,
+        "p999": 1
+      }
+    },
+    "histograms": {
+      "http.response_time": {
+        "min": 0,
+        "max": 1,
+        "count": 120,
+        "mean": 0.6,
+        "p50": 1,
+        "median": 1,
+        "p75": 1,
+        "p90": 1,
+        "p95": 1,
+        "p99": 1,
+        "p999": 1
+      },
+      "http.response_time.4xx": {
+        "min": 0,
+        "max": 1,
+        "count": 120,
+        "mean": 0.6,
+        "p50": 1,
+        "median": 1,
+        "p75": 1,
+        "p90": 1,
+        "p95": 1,
+        "p99": 1,
+        "p999": 1
+      },
+      "plugins.metrics-by-endpoint.response_time./users/login": {
+        "min": 0,
+        "max": 1,
+        "count": 120,
+        "mean": 0.6,
+        "p50": 1,
+        "median": 1,
+        "p75": 1,
+        "p90": 1,
+        "p95": 1,
+        "p99": 1,
+        "p999": 1
+      }
+    }
+  },
+  "intermediate": [
+    {
+      "counters": {
+        "vusers.created_by_name.로그인 후 socket.io 채팅 시나리오": 16,
+        "vusers.created": 16,
+        "http.requests": 16,
+        "http.codes.404": 16,
+        "http.responses": 16,
+        "http.downloaded_bytes": 1200,
+        "plugins.metrics-by-endpoint./users/login.codes.404": 16,
+        "errors.Failed capture or match": 16,
+        "vusers.failed": 16
+      },
+      "rates": {
+        "http.request_rate": 2
+      },
+      "http.request_rate": null,
+      "firstCounterAt": 1754586292275,
+      "firstHistogramAt": 1754586292294,
+      "lastCounterAt": 1754586299328,
+      "lastHistogramAt": 1754586299328,
+      "firstMetricAt": 1754586292275,
+      "lastMetricAt": 1754586299328,
+      "period": "1754586290000",
+      "summaries": {
+        "http.response_time": {
+          "min": 0,
+          "max": 1,
+          "count": 16,
+          "mean": 0.6,
+          "p50": 1,
+          "median": 1,
+          "p75": 1,
+          "p90": 1,
+          "p95": 1,
+          "p99": 1,
+          "p999": 1
+        },
+        "http.response_time.4xx": {
+          "min": 0,
+          "max": 1,
+          "count": 16,
+          "mean": 0.6,
+          "p50": 1,
+          "median": 1,
+          "p75": 1,
+          "p90": 1,
+          "p95": 1,
+          "p99": 1,
+          "p999": 1
+        },
+        "plugins.metrics-by-endpoint.response_time./users/login": {
+          "min": 0,
+          "max": 1,
+          "count": 16,
+          "mean": 0.6,
+          "p50": 1,
+          "median": 1,
+          "p75": 1,
+          "p90": 1,
+          "p95": 1,
+          "p99": 1,
+          "p999": 1
+        }
+      },
+      "histograms": {
+        "http.response_time": {
+          "min": 0,
+          "max": 1,
+          "count": 16,
+          "mean": 0.6,
+          "p50": 1,
+          "median": 1,
+          "p75": 1,
+          "p90": 1,
+          "p95": 1,
+          "p99": 1,
+          "p999": 1
+        },
+        "http.response_time.4xx": {
+          "min": 0,
+          "max": 1,
+          "count": 16,
+          "mean": 0.6,
+          "p50": 1,
+          "median": 1,
+          "p75": 1,
+          "p90": 1,
+          "p95": 1,
+          "p99": 1,
+          "p999": 1
+        },
+        "plugins.metrics-by-endpoint.response_time./users/login": {
+          "min": 0,
+          "max": 1,
+          "count": 16,
+          "mean": 0.6,
+          "p50": 1,
+          "median": 1,
+          "p75": 1,
+          "p90": 1,
+          "p95": 1,
+          "p99": 1,
+          "p999": 1
+        }
+      }
+    },
+    {
+      "counters": {
+        "vusers.created_by_name.로그인 후 socket.io 채팅 시나리오": 20,
+        "vusers.created": 20,
+        "http.requests": 20,
+        "http.codes.404": 20,
+        "http.responses": 20,
+        "http.downloaded_bytes": 1500,
+        "plugins.metrics-by-endpoint./users/login.codes.404": 20,
+        "errors.Failed capture or match": 20,
+        "vusers.failed": 20
+      },
+      "rates": {
+        "http.request_rate": 2
+      },
+      "http.request_rate": null,
+      "firstCounterAt": 1754586300274,
+      "firstHistogramAt": 1754586300281,
+      "lastCounterAt": 1754586309327,
+      "lastHistogramAt": 1754586309327,
+      "firstMetricAt": 1754586300274,
+      "lastMetricAt": 1754586309327,
+      "period": "1754586300000",
+      "summaries": {
+        "http.response_time": {
+          "min": 0,
+          "max": 1,
+          "count": 20,
+          "mean": 0.5,
+          "p50": 0,
+          "median": 0,
+          "p75": 1,
+          "p90": 1,
+          "p95": 1,
+          "p99": 1,
+          "p999": 1
+        },
+        "http.response_time.4xx": {
+          "min": 0,
+          "max": 1,
+          "count": 20,
+          "mean": 0.5,
+          "p50": 0,
+          "median": 0,
+          "p75": 1,
+          "p90": 1,
+          "p95": 1,
+          "p99": 1,
+          "p999": 1
+        },
+        "plugins.metrics-by-endpoint.response_time./users/login": {
+          "min": 0,
+          "max": 1,
+          "count": 20,
+          "mean": 0.5,
+          "p50": 0,
+          "median": 0,
+          "p75": 1,
+          "p90": 1,
+          "p95": 1,
+          "p99": 1,
+          "p999": 1
+        }
+      },
+      "histograms": {
+        "http.response_time": {
+          "min": 0,
+          "max": 1,
+          "count": 20,
+          "mean": 0.5,
+          "p50": 0,
+          "median": 0,
+          "p75": 1,
+          "p90": 1,
+          "p95": 1,
+          "p99": 1,
+          "p999": 1
+        },
+        "http.response_time.4xx": {
+          "min": 0,
+          "max": 1,
+          "count": 20,
+          "mean": 0.5,
+          "p50": 0,
+          "median": 0,
+          "p75": 1,
+          "p90": 1,
+          "p95": 1,
+          "p99": 1,
+          "p999": 1
+        },
+        "plugins.metrics-by-endpoint.response_time./users/login": {
+          "min": 0,
+          "max": 1,
+          "count": 20,
+          "mean": 0.5,
+          "p50": 0,
+          "median": 0,
+          "p75": 1,
+          "p90": 1,
+          "p95": 1,
+          "p99": 1,
+          "p999": 1
+        }
+      }
+    },
+    {
+      "counters": {
+        "vusers.created_by_name.로그인 후 socket.io 채팅 시나리오": 20,
+        "vusers.created": 20,
+        "http.requests": 20,
+        "http.codes.404": 20,
+        "http.responses": 20,
+        "http.downloaded_bytes": 1500,
+        "plugins.metrics-by-endpoint./users/login.codes.404": 20,
+        "errors.Failed capture or match": 20,
+        "vusers.failed": 20
+      },
+      "rates": {
+        "http.request_rate": 2
+      },
+      "http.request_rate": null,
+      "firstCounterAt": 1754586310274,
+      "firstHistogramAt": 1754586310276,
+      "lastCounterAt": 1754586319328,
+      "lastHistogramAt": 1754586319328,
+      "firstMetricAt": 1754586310274,
+      "lastMetricAt": 1754586319328,
+      "period": "1754586310000",
+      "summaries": {
+        "http.response_time": {
+          "min": 0,
+          "max": 1,
+          "count": 20,
+          "mean": 0.6,
+          "p50": 1,
+          "median": 1,
+          "p75": 1,
+          "p90": 1,
+          "p95": 1,
+          "p99": 1,
+          "p999": 1
+        },
+        "http.response_time.4xx": {
+          "min": 0,
+          "max": 1,
+          "count": 20,
+          "mean": 0.6,
+          "p50": 1,
+          "median": 1,
+          "p75": 1,
+          "p90": 1,
+          "p95": 1,
+          "p99": 1,
+          "p999": 1
+        },
+        "plugins.metrics-by-endpoint.response_time./users/login": {
+          "min": 0,
+          "max": 1,
+          "count": 20,
+          "mean": 0.6,
+          "p50": 1,
+          "median": 1,
+          "p75": 1,
+          "p90": 1,
+          "p95": 1,
+          "p99": 1,
+          "p999": 1
+        }
+      },
+      "histograms": {
+        "http.response_time": {
+          "min": 0,
+          "max": 1,
+          "count": 20,
+          "mean": 0.6,
+          "p50": 1,
+          "median": 1,
+          "p75": 1,
+          "p90": 1,
+          "p95": 1,
+          "p99": 1,
+          "p999": 1
+        },
+        "http.response_time.4xx": {
+          "min": 0,
+          "max": 1,
+          "count": 20,
+          "mean": 0.6,
+          "p50": 1,
+          "median": 1,
+          "p75": 1,
+          "p90": 1,
+          "p95": 1,
+          "p99": 1,
+          "p999": 1
+        },
+        "plugins.metrics-by-endpoint.response_time./users/login": {
+          "min": 0,
+          "max": 1,
+          "count": 20,
+          "mean": 0.6,
+          "p50": 1,
+          "median": 1,
+          "p75": 1,
+          "p90": 1,
+          "p95": 1,
+          "p99": 1,
+          "p999": 1
+        }
+      }
+    },
+    {
+      "counters": {
+        "vusers.created_by_name.로그인 후 socket.io 채팅 시나리오": 20,
+        "vusers.created": 20,
+        "http.requests": 20,
+        "http.codes.404": 20,
+        "http.responses": 20,
+        "http.downloaded_bytes": 1500,
+        "plugins.metrics-by-endpoint./users/login.codes.404": 20,
+        "errors.Failed capture or match": 20,
+        "vusers.failed": 20
+      },
+      "rates": {
+        "http.request_rate": 2
+      },
+      "http.request_rate": null,
+      "firstCounterAt": 1754586320274,
+      "firstHistogramAt": 1754586320277,
+      "lastCounterAt": 1754586329328,
+      "lastHistogramAt": 1754586329328,
+      "firstMetricAt": 1754586320274,
+      "lastMetricAt": 1754586329328,
+      "period": "1754586320000",
+      "summaries": {
+        "http.response_time": {
+          "min": 0,
+          "max": 1,
+          "count": 20,
+          "mean": 0.8,
+          "p50": 1,
+          "median": 1,
+          "p75": 1,
+          "p90": 1,
+          "p95": 1,
+          "p99": 1,
+          "p999": 1
+        },
+        "http.response_time.4xx": {
+          "min": 0,
+          "max": 1,
+          "count": 20,
+          "mean": 0.8,
+          "p50": 1,
+          "median": 1,
+          "p75": 1,
+          "p90": 1,
+          "p95": 1,
+          "p99": 1,
+          "p999": 1
+        },
+        "plugins.metrics-by-endpoint.response_time./users/login": {
+          "min": 0,
+          "max": 1,
+          "count": 20,
+          "mean": 0.8,
+          "p50": 1,
+          "median": 1,
+          "p75": 1,
+          "p90": 1,
+          "p95": 1,
+          "p99": 1,
+          "p999": 1
+        }
+      },
+      "histograms": {
+        "http.response_time": {
+          "min": 0,
+          "max": 1,
+          "count": 20,
+          "mean": 0.8,
+          "p50": 1,
+          "median": 1,
+          "p75": 1,
+          "p90": 1,
+          "p95": 1,
+          "p99": 1,
+          "p999": 1
+        },
+        "http.response_time.4xx": {
+          "min": 0,
+          "max": 1,
+          "count": 20,
+          "mean": 0.8,
+          "p50": 1,
+          "median": 1,
+          "p75": 1,
+          "p90": 1,
+          "p95": 1,
+          "p99": 1,
+          "p999": 1
+        },
+        "plugins.metrics-by-endpoint.response_time./users/login": {
+          "min": 0,
+          "max": 1,
+          "count": 20,
+          "mean": 0.8,
+          "p50": 1,
+          "median": 1,
+          "p75": 1,
+          "p90": 1,
+          "p95": 1,
+          "p99": 1,
+          "p999": 1
+        }
+      }
+    },
+    {
+      "counters": {
+        "vusers.created_by_name.로그인 후 socket.io 채팅 시나리오": 20,
+        "vusers.created": 20,
+        "http.requests": 20,
+        "http.codes.404": 20,
+        "http.responses": 20,
+        "http.downloaded_bytes": 1500,
+        "plugins.metrics-by-endpoint./users/login.codes.404": 20,
+        "errors.Failed capture or match": 20,
+        "vusers.failed": 20
+      },
+      "rates": {
+        "http.request_rate": 2
+      },
+      "http.request_rate": null,
+      "firstCounterAt": 1754586330274,
+      "firstHistogramAt": 1754586330277,
+      "lastCounterAt": 1754586339327,
+      "lastHistogramAt": 1754586339327,
+      "firstMetricAt": 1754586330274,
+      "lastMetricAt": 1754586339327,
+      "period": "1754586330000",
+      "summaries": {
+        "http.response_time": {
+          "min": 0,
+          "max": 1,
+          "count": 20,
+          "mean": 0.7,
+          "p50": 1,
+          "median": 1,
+          "p75": 1,
+          "p90": 1,
+          "p95": 1,
+          "p99": 1,
+          "p999": 1
+        },
+        "http.response_time.4xx": {
+          "min": 0,
+          "max": 1,
+          "count": 20,
+          "mean": 0.7,
+          "p50": 1,
+          "median": 1,
+          "p75": 1,
+          "p90": 1,
+          "p95": 1,
+          "p99": 1,
+          "p999": 1
+        },
+        "plugins.metrics-by-endpoint.response_time./users/login": {
+          "min": 0,
+          "max": 1,
+          "count": 20,
+          "mean": 0.7,
+          "p50": 1,
+          "median": 1,
+          "p75": 1,
+          "p90": 1,
+          "p95": 1,
+          "p99": 1,
+          "p999": 1
+        }
+      },
+      "histograms": {
+        "http.response_time": {
+          "min": 0,
+          "max": 1,
+          "count": 20,
+          "mean": 0.7,
+          "p50": 1,
+          "median": 1,
+          "p75": 1,
+          "p90": 1,
+          "p95": 1,
+          "p99": 1,
+          "p999": 1
+        },
+        "http.response_time.4xx": {
+          "min": 0,
+          "max": 1,
+          "count": 20,
+          "mean": 0.7,
+          "p50": 1,
+          "median": 1,
+          "p75": 1,
+          "p90": 1,
+          "p95": 1,
+          "p99": 1,
+          "p999": 1
+        },
+        "plugins.metrics-by-endpoint.response_time./users/login": {
+          "min": 0,
+          "max": 1,
+          "count": 20,
+          "mean": 0.7,
+          "p50": 1,
+          "median": 1,
+          "p75": 1,
+          "p90": 1,
+          "p95": 1,
+          "p99": 1,
+          "p999": 1
+        }
+      }
+    },
+    {
+      "counters": {
+        "vusers.created_by_name.로그인 후 socket.io 채팅 시나리오": 20,
+        "vusers.created": 20,
+        "http.requests": 20,
+        "http.codes.404": 20,
+        "http.responses": 20,
+        "http.downloaded_bytes": 1500,
+        "plugins.metrics-by-endpoint./users/login.codes.404": 20,
+        "errors.Failed capture or match": 20,
+        "vusers.failed": 20
+      },
+      "rates": {
+        "http.request_rate": 2
+      },
+      "http.request_rate": null,
+      "firstCounterAt": 1754586340274,
+      "firstHistogramAt": 1754586340277,
+      "lastCounterAt": 1754586349328,
+      "lastHistogramAt": 1754586349328,
+      "firstMetricAt": 1754586340274,
+      "lastMetricAt": 1754586349328,
+      "period": "1754586340000",
+      "summaries": {
+        "http.response_time": {
+          "min": 0,
+          "max": 1,
+          "count": 20,
+          "mean": 0.7,
+          "p50": 1,
+          "median": 1,
+          "p75": 1,
+          "p90": 1,
+          "p95": 1,
+          "p99": 1,
+          "p999": 1
+        },
+        "http.response_time.4xx": {
+          "min": 0,
+          "max": 1,
+          "count": 20,
+          "mean": 0.7,
+          "p50": 1,
+          "median": 1,
+          "p75": 1,
+          "p90": 1,
+          "p95": 1,
+          "p99": 1,
+          "p999": 1
+        },
+        "plugins.metrics-by-endpoint.response_time./users/login": {
+          "min": 0,
+          "max": 1,
+          "count": 20,
+          "mean": 0.7,
+          "p50": 1,
+          "median": 1,
+          "p75": 1,
+          "p90": 1,
+          "p95": 1,
+          "p99": 1,
+          "p999": 1
+        }
+      },
+      "histograms": {
+        "http.response_time": {
+          "min": 0,
+          "max": 1,
+          "count": 20,
+          "mean": 0.7,
+          "p50": 1,
+          "median": 1,
+          "p75": 1,
+          "p90": 1,
+          "p95": 1,
+          "p99": 1,
+          "p999": 1
+        },
+        "http.response_time.4xx": {
+          "min": 0,
+          "max": 1,
+          "count": 20,
+          "mean": 0.7,
+          "p50": 1,
+          "median": 1,
+          "p75": 1,
+          "p90": 1,
+          "p95": 1,
+          "p99": 1,
+          "p999": 1
+        },
+        "plugins.metrics-by-endpoint.response_time./users/login": {
+          "min": 0,
+          "max": 1,
+          "count": 20,
+          "mean": 0.7,
+          "p50": 1,
+          "median": 1,
+          "p75": 1,
+          "p90": 1,
+          "p95": 1,
+          "p99": 1,
+          "p999": 1
+        }
+      }
+    },
+    {
+      "counters": {
+        "vusers.created_by_name.로그인 후 socket.io 채팅 시나리오": 4,
+        "vusers.created": 4,
+        "http.requests": 4,
+        "http.codes.404": 4,
+        "http.responses": 4,
+        "http.downloaded_bytes": 300,
+        "plugins.metrics-by-endpoint./users/login.codes.404": 4,
+        "errors.Failed capture or match": 4,
+        "vusers.failed": 4
+      },
+      "rates": {
+        "http.request_rate": 4
+      },
+      "http.request_rate": null,
+      "firstCounterAt": 1754586350274,
+      "firstHistogramAt": 1754586350277,
+      "lastCounterAt": 1754586351328,
+      "lastHistogramAt": 1754586351328,
+      "firstMetricAt": 1754586350274,
+      "lastMetricAt": 1754586351328,
+      "period": "1754586350000",
+      "summaries": {
+        "http.response_time": {
+          "min": 0,
+          "max": 0,
+          "count": 4,
+          "mean": 0,
+          "p50": 0,
+          "median": 0,
+          "p75": 0,
+          "p90": 0,
+          "p95": 0,
+          "p99": 0,
+          "p999": 0
+        },
+        "http.response_time.4xx": {
+          "min": 0,
+          "max": 0,
+          "count": 4,
+          "mean": 0,
+          "p50": 0,
+          "median": 0,
+          "p75": 0,
+          "p90": 0,
+          "p95": 0,
+          "p99": 0,
+          "p999": 0
+        },
+        "plugins.metrics-by-endpoint.response_time./users/login": {
+          "min": 0,
+          "max": 0,
+          "count": 4,
+          "mean": 0,
+          "p50": 0,
+          "median": 0,
+          "p75": 0,
+          "p90": 0,
+          "p95": 0,
+          "p99": 0,
+          "p999": 0
+        }
+      },
+      "histograms": {
+        "http.response_time": {
+          "min": 0,
+          "max": 0,
+          "count": 4,
+          "mean": 0,
+          "p50": 0,
+          "median": 0,
+          "p75": 0,
+          "p90": 0,
+          "p95": 0,
+          "p99": 0,
+          "p999": 0
+        },
+        "http.response_time.4xx": {
+          "min": 0,
+          "max": 0,
+          "count": 4,
+          "mean": 0,
+          "p50": 0,
+          "median": 0,
+          "p75": 0,
+          "p90": 0,
+          "p95": 0,
+          "p99": 0,
+          "p999": 0
+        },
+        "plugins.metrics-by-endpoint.response_time./users/login": {
+          "min": 0,
+          "max": 0,
+          "count": 4,
+          "mean": 0,
+          "p50": 0,
+          "median": 0,
+          "p75": 0,
+          "p90": 0,
+          "p95": 0,
+          "p99": 0,
+          "p999": 0
+        }
+      }
+    }
+  ]
+}

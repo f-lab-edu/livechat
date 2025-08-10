@@ -23,7 +23,6 @@ export class ChatsService {
   async joinRoom(client: Socket, youtubeStreamId: number, user?: JwtPayload): Promise<void> {
     // 채팅방에 입장하는 로직을 구현합니다.
     this.logger.log(`유저 ${user?.userId ?? null}가 채팅방에 입장: Stream ID ${youtubeStreamId}`);
-    console.log('test');
     await client.join(`room-${youtubeStreamId}`);
 
     // 예시로 로그에 출력

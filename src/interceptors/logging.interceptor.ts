@@ -1,10 +1,5 @@
 // src/common/interceptors/logging.interceptor.ts
-import {
-  Injectable,
-  NestInterceptor,
-  ExecutionContext,
-  CallHandler,
-} from '@nestjs/common';
+import { Injectable, NestInterceptor, ExecutionContext, CallHandler } from '@nestjs/common';
 import { Request } from 'express';
 import { Observable, tap } from 'rxjs';
 import * as fs from 'fs/promises';
@@ -34,10 +29,11 @@ export class LoggingInterceptor implements NestInterceptor {
 
           const logFileName = `api_${date}.log`;
           const logPath = path.join(__dirname, '../../logs', logFileName);
+          // await fs.mkdir(logPath, { recursive: true });
 
           const log = `[${timestamp}] ${method} ${url} | ${duration}ms | body: ${JSON.stringify(body)} | response: ${JSON.stringify(data)}\n`;
 
-          await fs.appendFile(logPath, log, 'utf8');
+          // await fs.appendFile(logPath, log, 'utf8');
 
           console.log(log.trim()); // optional: 콘솔에도 찍기
         })(),

@@ -3,9 +3,11 @@ import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { LoggingInterceptor } from './interceptors/logging.interceptor';
+import { IoAdapter } from '@nestjs/platform-socket.io';
 
 void (async () => {
   const httpApp = await NestFactory.create(AppModule, { cors: true });
+  httpApp.useWebSocketAdapter(new IoAdapter(httpApp));
 
   httpApp.setGlobalPrefix('/api');
 
