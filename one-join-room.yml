@@ -1,18 +1,8 @@
 config:
-  target: 'http://localhost:3000'
+  target: 'http://ec2-3-37-89-9.ap-northeast-2.compute.amazonaws.com:3000'
   phases:
     - duration: 5 # 5초 동안
-      arrivalCount: 10
-    - duration: 10
-      arrivalCount: 40
-    - duration: 10
-      arrivalCount: 100
-    - duration: 10
-      arrivalCount: 200
-    - duration: 10
-      arrivalCount: 300
-    - duration: 10
-      arrivalCount: 400
+      arrivalCount: 10000 # 10000명 접속
   socketio:
     path: '/socket.io'
   processor: './auth-processor.js'
@@ -25,8 +15,7 @@ config:
     order: sequence
     skipHeader: true
   variables:
-    targetRoomId: 1
-    roomCount: 2 # 방 개수
+    roomCount: 1000 # 방 개수
     holdMs: 15000 # 방에 머무는 시간(2초)
     syncDelayMs: 0
 
@@ -49,15 +38,15 @@ scenarios:
       - function: 'setupRooms'
 
       # 3) 모든 방에 한 번씩 joinRoom
-      # - loop:
-      #     - namespace: '/chat'
-      #       emit:
-      #         channel: 'joinRoom'
-      #         data:
-      #           youtubeStreamId: '{{ $loopElement }}'
-      #           token: '{{ accessToken }}'
-      #     - think: 0.01 # 폭주 방지용(선택)
-      #   over: 'rooms' # setupRooms가 만든 배열
+      - loop:
+          - namespace: '/chat'
+            emit:
+              channel: 'joinRoom'
+              data:
+                youtubeStreamId: '{{ $loopElement }}'
+                token: '{{ accessToken }}'
+          - think: 0.01 # 폭주 방지용(선택)
+        over: 'rooms' # setupRooms가 만든 배열
 
       - namespace: '/chat'
         emit:
@@ -72,18 +61,18 @@ scenarios:
           data:
             youtubeStreamId: '{{ targetRoomId }}'
       # 4) 2초마다 다음 방으로 chat (무한 루프)
-      # - function: 'initCursor'
-      # - function: 'setNow' # currentRoom 설정
-      # - loop:
-      #     - function: 'pickNextRoom' # currentRoom 설정
-      #     - namespace: '/chat'
-      #       emit:
-      #         channel: 'chat'
-      #         data:
-      #           youtubeStreamId: '{{ currentRoom }}'
-      #           message: 'RR {{ loginId }} chat to room {{ currentRoom }} at {{ nowISO }}'
-      #           token: '{{ accessToken }}'
-      #     - think: 0.01 # 2초마다 한 건
-      #   count: 1000
+      - function: 'initCursor'
+      - function: 'setNow' # currentRoom 설정
+      - loop:
+          - function: 'pickNextRoom' # currentRoom 설정
+          - namespace: '/chat'
+            emit:
+              channel: 'chat'
+              data:
+                youtubeStreamId: '{{ currentRoom }}'
+                message: 'RR {{ loginId }} chat to room {{ currentRoom }} at {{ nowISO }}'
+                token: '{{ accessToken }}'
+          - think: 0.01 # 2초마다 한 건
+        count: 100
 
       #count를 생략하면 무한 반복됨(테스트 duration 동안). :contentReference[oaicite:1]{index=1}

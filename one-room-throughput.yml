@@ -1,8 +1,8 @@
 config:
   target: 'http://localhost:3000'
   phases:
-    - duration: 1
-      arrivalCount: 100 # 40명 동시 시작(거의 동시에)
+    - duration: 300
+      arrivalCount: 10000
   socketio:
     path: '/socket.io'
   processor: './auth-processor.js'

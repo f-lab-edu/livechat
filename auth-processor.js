@@ -1,53 +1,56 @@
-// ./auth-processor.js
+'use strict';
+
+// ---- export hooks ----
 module.exports = {
+  beforeScenario,
   setupRooms,
   initCursor,
   pickNextRoom,
-  setNow, // ← 추가
-  syncStart,
+  setNow,
   hold,
 };
 
-let GLOBAL_START_AT = null;
+// ---- utils ----
+const sleep = (ms) => new Promise((res) => setTimeout(res, ms));
 
-function syncStart(context, events, done) {
-  // 모든 VU를 같은 시각까지 대기시켜 '동시성'을 맞춤
-  const delayMs = Number(context.vars.syncDelayMs ?? 1500);
-  if (!GLOBAL_START_AT) GLOBAL_START_AT = Date.now() + delayMs;
-  const wait = GLOBAL_START_AT - Date.now();
-  setTimeout(done, wait > 0 ? wait : 0);
-}
-
-function hold(context, events, done) {
-  // 연결을 유지하기 위한 단순 wait
-  const ms = Number(context.vars.holdMs ?? 10000);
-  setTimeout(done, ms);
+function makePayload(size) {
+  const buf = Buffer.alloc(size);
+  for (let i = 0; i < size; i++) buf[i] = Math.floor(Math.random() * 256);
+  return buf.toString('base64');
 }
 
-function setupRooms(context, events, done) {
-  const N = Number(context.vars.roomCount);
-  context.vars.rooms = Array.from({ length: N }, (_, i) => i + 1);
-  return done();
-}
-function initCursor(context, events, done) {
-  context.vars.cursor = 0;
-  return done();
-}
-function pickNextRoom(context, events, done) {
-  const rooms = context.vars.rooms || [];
-  if (!rooms.length) return done(new Error('rooms not initialized'));
-  const i = context.vars.cursor % rooms.length;
-  context.vars.currentRoom = rooms[i];
-  context.vars.cursor += 1;
-  return done();
+// ---- hooks (Promise/async style) ----
+
+// 시나리오 시작 전에 1회 실행
+async function beforeScenario(req, context, ee) {
+  const size = Number(context.vars.payloadSize || 2048);
+  context.vars.randomPayload = makePayload(size);
+  // return 또는 아무것도 안 해도 됨(한 번만 resolve)
 }
 
-// ★ 지금 시각을 ms/ISO 둘 다 변수로 넣어줌
-function setNow(context, events, done) {
-  const now = new Date();
-  context.vars.nowMs = now.getTime(); // 1712345678901
-  context.vars.nowISO = now.toISOString(); // 2025-08-09T07:58:31.123Z
-  return done();
+async function setupRooms(req, context, ee) {
+  const n = Number(context.vars.roomCount || 1000);
+  context.vars.rooms = Array.from({ length: n }, (_, i) => i + 1);
+  context.vars.targetRoomId = 1;
 }
 
-// eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjUsImxvZ2luSWQiOiJ0ZXN0dXNlcjUiLCJpYXQiOjE3NTQ3OTAyMDAsImV4cCI6MTc1NDgzMzQwMH0.qkJcTgkW6XzM0Pe1zSBkspj_A1CguC_blC1bKxBWauA
+async function initCursor(req, context, ee) {
+  context.vars._cursor = 0;
+}
+
+async function pickNextRoom(req, context, ee) {
+  const rooms = context.vars.rooms || [1];
+  const c = context.vars._cursor || 0;
+  const idx = c % rooms.length;
+  context.vars.currentRoom = rooms[idx];
+  context.vars._cursor = c + 1;
+}
+
+async function setNow(req, context, ee) {
+  context.vars.nowISO = new Date().toISOString();
+}
+
+async function hold(req, context, ee) {
+  const ms = Number(context.vars.holdMs || 0);
+  if (ms > 0) await sleep(ms);
+}

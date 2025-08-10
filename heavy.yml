@@ -1,0 +1,120 @@
+config:
+  target: 'http://ec2-3-37-89-9.ap-northeast-2.compute.amazonaws.com:3000'
+
+  # t2.micro: 1 vCPU, 1GB RAM, CPU credit 기반. 지속 부하(>10분)로 크레딧 고갈 유도.
+  phases:
+    - duration: 120 # 2분 램프업
+      arrivalRate: 1500
+    - duration: 600 # 10분 지속(크레딧 소진 구간)
+      arrivalRate: 3000
+    - duration: 120 # 2분 스파이크
+      arrivalRate: 8000
+
+  engines:
+    socketio: {}
+  socketio:
+    path: '/socket.io'
+    transports: ['websocket'] # 폴링 금지, 웹소켓 고정
+    # forceNew: true             # 더 가혹하게 하려면 주석 해제
+
+  processor: './auth-processor.js'
+
+  payload:
+    path: './users.csv'
+    fields: [loginId, loginPassword]
+    order: sequence
+    skipHeader: true
+
+  variables:
+    roomCount: 3000 # 방 수 크게
+    hotRoomId1: 777 # 브로드캐스트 유발용 핫방
+    hotRoomId2: 888 # 핫방 2개
+    payloadSize: 2048 # 2KB 페이로드 (원하면 4096~8192로 ↑)
+    holdMs: 100 # 방 머무는 시간 짧게
+
+scenarios:
+  - name: 't2-micro-killer'
+    engine: socketio
+    flow:
+      # 1) 로그인 -> 토큰
+      - post:
+          url: '/api/users/login'
+          json:
+            loginId: '{{ loginId }}'
+            loginPassword: '{{ loginPassword }}'
+          capture:
+            - json: '$.accessToken'
+              as: accessToken
+
+      # 2) 방 배열 준비
+      - function: 'setupRooms'
+
+      # 3) 초기 다량 조인 (조인 비용 & 메모리 압박)
+      - loop:
+          - namespace: '/chat'
+            emit:
+              channel: 'joinRoom'
+              data: { youtubeStreamId: '{{ $loopElement }}', token: '{{ accessToken }}' }
+          - think: 0
+        count: 100
+        over: 'rooms'
+
+      # 4) 핫방 두 곳 조인
+      - namespace: '/chat'
+        emit:
+          channel: 'joinRoom'
+          data: { youtubeStreamId: '{{ hotRoomId1 }}', token: '{{ accessToken }}' }
+      - namespace: '/chat'
+        emit:
+          channel: 'joinRoom'
+          data: { youtubeStreamId: '{{ hotRoomId2 }}', token: '{{ accessToken }}' }
+
+      # 5) 메시지 폭주 (핫방 + 일반방 교차), think=0로 최대 속도
+      - function: 'initCursor'
+      - function: 'setNow'
+      - loop:
+          - function: 'pickNextRoom'
+
+          # 일반방 채팅
+          - namespace: '/chat'
+            emit:
+              channel: 'chat'
+              data:
+                youtubeStreamId: '{{ currentRoom }}'
+                message: 'N{{ randomPayload }}N {{ loginId }} -> {{ currentRoom }} {{ nowISO }}'
+                token: '{{ accessToken }}'
+
+          # 핫방1 채팅
+          - namespace: '/chat'
+            emit:
+              channel: 'chat'
+              data:
+                youtubeStreamId: '{{ hotRoomId1 }}'
+                message: 'H1{{ randomPayload }}H1 {{ loginId }} {{ nowISO }}'
+                token: '{{ accessToken }}'
+
+          # 핫방2 채팅
+          - namespace: '/chat'
+            emit:
+              channel: 'chat'
+              data:
+                youtubeStreamId: '{{ hotRoomId2 }}'
+                message: 'H2{{ randomPayload }}H2 {{ loginId }} {{ nowISO }}'
+                token: '{{ accessToken }}'
+
+          - think: 0
+        count: 3000 # 유저당 3,000 메시지 (필요시 ↑)
+
+      # 6) 조인/리브 폭주 라운드
+      - loop:
+          - namespace: '/chat'
+            emit:
+              channel: 'leaveRoom'
+              data: { youtubeStreamId: '{{ currentRoom }}' }
+          - function: 'pickNextRoom'
+          - namespace: '/chat'
+            emit:
+              channel: 'joinRoom'
+              data: { youtubeStreamId: '{{ currentRoom }}', token: '{{ accessToken }}' }
+          - think: 0
+        count: 500

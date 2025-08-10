@@ -1,8 +1,8 @@
 config:
-  target: 'http://localhost:3000'
+  target: 'http://3.37.89.9:3000'
   phases:
-    - duration: 5
-      arrivalCount: 100 # 예: 100명
+    - duration: 10
+      arrivalCount: 100000 # 예: 100명
   socketio:
     path: '/socket.io'
   processor: './auth-processor.js'
