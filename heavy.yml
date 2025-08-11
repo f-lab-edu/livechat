@@ -1,5 +1,5 @@
 config:
-  target: 'http://ec2-3-37-89-9.ap-northeast-2.compute.amazonaws.com:3000'
+  target: 'https://liveschats.store'
 
   # t2.micro: 1 vCPU, 1GB RAM, CPU credit 기반. 지속 부하(>10분)로 크레딧 고갈 유도.
   phases:
@@ -55,6 +55,7 @@ scenarios:
             emit:
               channel: 'joinRoom'
               data: { youtubeStreamId: '{{ $loopElement }}', token: '{{ accessToken }}' }
+              ack: false
           - think: 0
         count: 100
         over: 'rooms'
@@ -64,10 +65,12 @@ scenarios:
         emit:
           channel: 'joinRoom'
           data: { youtubeStreamId: '{{ hotRoomId1 }}', token: '{{ accessToken }}' }
+          ack: false
       - namespace: '/chat'
         emit:
           channel: 'joinRoom'
           data: { youtubeStreamId: '{{ hotRoomId2 }}', token: '{{ accessToken }}' }
+          ack: false
 
       # 5) 메시지 폭주 (핫방 + 일반방 교차), think=0로 최대 속도
       - function: 'initCursor'
@@ -83,6 +86,7 @@ scenarios:
                 youtubeStreamId: '{{ currentRoom }}'
                 message: 'N{{ randomPayload }}N {{ loginId }} -> {{ currentRoom }} {{ nowISO }}'
                 token: '{{ accessToken }}'
+              ack: false
 
           # 핫방1 채팅
           - namespace: '/chat'
@@ -92,6 +96,7 @@ scenarios:
                 youtubeStreamId: '{{ hotRoomId1 }}'
                 message: 'H1{{ randomPayload }}H1 {{ loginId }} {{ nowISO }}'
                 token: '{{ accessToken }}'
+              ack: false
 
           # 핫방2 채팅
           - namespace: '/chat'
@@ -101,8 +106,9 @@ scenarios:
                 youtubeStreamId: '{{ hotRoomId2 }}'
                 message: 'H2{{ randomPayload }}H2 {{ loginId }} {{ nowISO }}'
                 token: '{{ accessToken }}'
+              ack: false
 
-          - think: 0
+          - think: 0.01
         count: 3000 # 유저당 3,000 메시지 (필요시 ↑)
 
       # 6) 조인/리브 폭주 라운드
@@ -111,10 +117,12 @@ scenarios:
             emit:
               channel: 'leaveRoom'
               data: { youtubeStreamId: '{{ currentRoom }}' }
+            ack: false
           - function: 'pickNextRoom'
           - namespace: '/chat'
             emit:
               channel: 'joinRoom'
               data: { youtubeStreamId: '{{ currentRoom }}', token: '{{ accessToken }}' }
+            ack: false
           - think: 0
         count: 500

@@ -1,0 +1,45 @@
+config:
+  target: 'https://liveschats.store'
+  phases:
+    - duration: 100
+      arrivalCount: 100 # ← 여러 유저 동시 시작
+  socketio:
+    path: '/socket.io'
+  processor: './auth-processor.js'
+
+  payload:
+    path: './testusers_1_10000.csv'
+    fields: [loginId, loginPassword]
+    order: sequence
+    skipHeader: true
+
+  variables:
+    roomCount: 1000 # 전체 방 수
+
+scenarios:
+  - name: 'multi-users -> sharded rooms'
+    engine: socketio
+    flow:
+      - post:
+          url: '/api/users/login'
+          json: { loginId: '{{ loginId }}', loginPassword: '{{ loginPassword }}' }
+          capture: [{ json: '$.accessToken', as: accessToken }]
+
+      - function: 'assignRoom' # ← 이 유저의 방 결정: {{ myRoom }}
+
+      - namespace: '/chat'
+        emit:
+          channel: 'joinRoom'
+          data: { youtubeStreamId: '{{ myRoom }}', token: '{{ accessToken }}' }
+
+      - loop:
+          - function: 'setNow'
+          - namespace: '/chat'
+            emit:
+              channel: 'chat'
+              data:
+                youtubeStreamId: '{{ myRoom }}'
+                message: 'msg {{$loopCount}} by {{ loginId }} in room {{ myRoom }} at {{ nowISO }}'
+                token: '{{ accessToken }}'
+          - think: 0.02
+        count: 100

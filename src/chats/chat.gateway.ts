@@ -1,7 +1,6 @@
 import { ConnectedSocket, MessageBody, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { ChatsService } from './chats.service';
-import { CurrentSocketUser, OptionalSocketUser } from '../auth/current-user.decorator';
 import { JwtPayload } from '../auth/jwt-strategy';
 import * as jwt from 'jsonwebtoken';
 
