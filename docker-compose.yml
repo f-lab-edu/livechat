@@ -20,3 +20,7 @@ services:
 
 volumes:
   pgdata:
+
+networks:
+  app-network:
+    driver: bridge
