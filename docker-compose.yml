@@ -1,23 +1,4 @@
 services:
-  backend:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: livechat-backend
-    ports:
-      - '5555:5555'
-    env_file:
-      - .env
-    volumes:
-      - .:/app
-    command: sh -c "npx prisma db push && npx prisma generate && npm run build & npm run start:prod & npx prisma studio"
-    environment:
-      - TZ=Asia/Seoul
-      - CHOKIDAR_USEPOLLING=true
-      - CHOKIDAR_INTERVAL=1000
-    networks:
-      - app-network
-
   nginx:
     build:
       context: .
@@ -32,8 +13,6 @@ services:
       - /etc/letsencrypt/live/liveschats.store/:/etc/nginx/cert
       - /etc/letsencrypt/archive/liveschats.store/:/etc/archive/liveschats.store
     restart: always
-    depends_on:
-      - backend
     networks:
       - app-network
     environment:
