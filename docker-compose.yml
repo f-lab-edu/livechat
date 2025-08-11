@@ -13,8 +13,6 @@ services:
       - /etc/letsencrypt/live/liveschats.store/:/etc/nginx/cert
       - /etc/letsencrypt/archive/liveschats.store/:/etc/archive/liveschats.store
     restart: always
-    depends_on:
-      - backend
     networks:
       - app-network
     environment:
@@ -22,7 +20,3 @@ services:
 
 volumes:
   pgdata:
-
-networks:
-  app-network:
-    driver: bridge
