@@ -51,6 +51,12 @@ export class ChatGateway {
     this.server.to(`room-${data.youtubeStreamId}`).emit('chat', data.message);
   }
 
+  @SubscribeMessage('heartbeat')
+  hb(@ConnectedSocket() client: Socket, @MessageBody() data: { streamId: number; token: string }) {
+    const user = jwt.verify(data.token, process.env.JWT_SECRET!) as JwtPayload;
+    this.chatsService.heartbeat(client, data.streamId, user);
+  }
+
   private async broadcastViewerCount(youtubeStreamId: number) {
     const roomName = `room-${youtubeStreamId}`;
     const clients = await this.server.in(roomName).allSockets();

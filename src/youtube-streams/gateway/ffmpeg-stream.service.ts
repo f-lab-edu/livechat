@@ -3,7 +3,7 @@ import { ChildProcessWithoutNullStreams, spawn } from 'child_process';
 import { Socket } from 'socket.io';
 import { JwtPayload } from '../../auth/jwt-strategy';
 import { UsersService } from '../../users/users.service';
-import ffmpegInstaller from '@ffmpeg-installer/ffmpeg';
+import * as ffmpegInstaller from '@ffmpeg-installer/ffmpeg';
 const ffmpegPath = ffmpegInstaller.path;
 
 @Injectable()
