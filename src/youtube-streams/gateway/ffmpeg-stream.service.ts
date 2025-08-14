@@ -3,6 +3,8 @@ import { ChildProcessWithoutNullStreams, spawn } from 'child_process';
 import { Socket } from 'socket.io';
 import { JwtPayload } from '../../auth/jwt-strategy';
 import { UsersService } from '../../users/users.service';
+import ffmpegInstaller from '@ffmpeg-installer/ffmpeg';
+const ffmpegPath = ffmpegInstaller.path;
 
 @Injectable()
 export class FfmpegStreamService {
@@ -23,7 +25,7 @@ export class FfmpegStreamService {
 
     //spawn 자체가 비동기(non-blocking) API return ChildProcess 객체(ffmpeg)를 돌려주고, 내부적으로 FFmpeg 프로세스는 백그라운드에서 실행됩니다
     // prettier-ignore
-    const ffmpeg = spawn('ffmpeg', [
+    const ffmpeg = spawn(ffmpegPath, [
         '-f','webm','-i','pipe:0',
   
         // 명시적 stream mapping
@@ -35,7 +37,7 @@ export class FfmpegStreamService {
         '-c:a','aac','-ar','48000','-b:a','128k',
   
         // HLS가 이해 가능한 포맷
-        '-f','flv',`rtmp://nginx-hls/stream/${streamKey}`,
+        '-f','flv',`rtmp://liveschats.store:1935/stream/${streamKey}`,
       ]);
 
     // ffmpeg 프로세스 생성이나 실행 중 오류 발생 시 처리
