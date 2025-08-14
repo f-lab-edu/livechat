@@ -180,14 +180,15 @@ export class ChatsService implements OnModuleInit, OnModuleDestroy {
   async joinRoom(client: Socket, youtubeStreamId: number, user?: JwtPayload): Promise<void> {
     this.logger.log(`유저 ${user?.userId ?? null}가 채팅방에 입장: Stream ID ${youtubeStreamId}`);
     await client.join(`room-${youtubeStreamId}`);
-
     if (user?.userId != null) {
       this.addSocketToRoom(client.id, this.roomKey(youtubeStreamId), user.userId);
+      client.to(`room-${youtubeStreamId}`).emit('chat', `${user.userId}가 채팅방에 입장했습니다.`);
     }
   }
 
-  async leaveRoom(client: Socket, youtubeStreamId: number): Promise<void> {
+  async leaveRoom(client: Socket, youtubeStreamId: number, user?: JwtPayload): Promise<void> {
     this.logger.log(`유저가 채팅방에서 나감: Stream ID ${youtubeStreamId}`);
+    client.to(`room-${youtubeStreamId}`).emit('chat', `${user?.userId ?? null}가 채팅방에서 나갔습니다.`);
     await client.leave(`room-${youtubeStreamId}`);
 
     this.removeSocketFromRoom(client.id, this.roomKey(youtubeStreamId));
