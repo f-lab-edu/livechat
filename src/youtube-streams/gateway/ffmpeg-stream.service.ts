@@ -35,7 +35,7 @@ export class FfmpegStreamService {
         '-c:a','aac','-ar','48000','-b:a','128k',
   
         // HLS가 이해 가능한 포맷
-        '-f','flv',`rtmp://nginx-hls/stream/${streamKey}`,
+        '-f','flv',`rtmp://localhost:1935/stream/${streamKey}`,
       ]);
 
     // ffmpeg 프로세스 생성이나 실행 중 오류 발생 시 처리
